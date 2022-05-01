@@ -8,7 +8,7 @@ and private_deployer.json into packages/contracts directory
 
 ## Contracts
 
-List contract is deployed to mumbai network: 0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb
+List contract is deployed to mumbai network: 0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb  
 Implementation contract: 0x355bd8a9898751b779bf621650d70eea93fd65ec
 
 https://mumbai.polygonscan.com/address/0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb
@@ -16,6 +16,12 @@ https://mumbai.polygonscan.com/address/0xD7737dDf725f5006cCc682b337b4cc4dfd5c04f
 
 
 Proof contract is deployed to rinkeby network:
+
+
+### Usage:
+
+	List contract: add( address, version, hash )
+	Being added record for address changing to new version with additional information written to string hash (that can be IPFS hash or proof)
 
 ## Command line tools
 
