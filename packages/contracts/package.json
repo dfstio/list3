@@ -1,9 +1,40 @@
 {
-  "name": "contracts",
+  "name": "@list/contracts",
   "version": "1.0.0",
   "description": "Ethereum contracts for list",
   "main": "index.js",
   "author": "Benjamin Herald",
   "license": "MIT",
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.5",
+    "@nomiclabs/hardhat-etherscan": "^3.0.3",
+    "@nomiclabs/hardhat-waffle": "^2.0.3",
+    "@openzeppelin/hardhat-upgrades": "^1.12.0",
+    "chai": "^4.3.6",
+    "ethereum-waffle": "^3.4.4",
+    "ethers": "^5.6.4",
+    "hardhat": "^2.9.3",
+    "hardhat-abi-exporter": "^2.8.0",
+    "hardhat-contract-sizer": "^2.5.1"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts-upgradeable": "^4.5.2",
+    "chalk": "^5.0.0"
+  },
+  "scripts": {
+    "balance": "hardhat balance",
+    "commit": "git commit -a -S -m",
+    "archive": "git archive -o list-contracts.zip HEAD",
+    "compile": "hardhat compile",
+    "deploylist": "hardhat run --network mumbai  scripts/deploylist.js",
+    "deployverifier": "hardhat run --network rinkeby scripts/deployverifier.js",
+    "upgradelist": "hardhat run --network mumbai scripts/upgradelist.js",
+    "accounts": "hardhat accounts",
+    "verifyverifier": "hardhat etherscan-verify --network rinkeby --api-key FQ1NYZXPQIICKE7U41VSRB7TPKZJQKI7SH",
+    "verifylist": "hardhat verify --network mumbai 0x355bd8a9898751b779bf621650d70eea93fd65ec",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "size": "hardhat size-contracts",
+    "abi": "hardhat export-abi"
+  }
 }
