@@ -1,3 +1,3 @@
 module.exports = {
-    PORT: '30000'
+    PORT: '3000'
 };

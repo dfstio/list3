@@ -1,0 +1,18 @@
+{
+  "name": "@list/cli",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Benjamin Herald",
+  "license": "MIT",
+  "scripts": {
+    "sync": "node sync.js",
+    "archive": "git archive -o cli.zip HEAD"
+  },
+  "dependencies": {
+    "@list/config": "1.0.0",
+    "circomlibjs": "^0.1.2",
+    "eth-revert-reason": "^1.0.3",
+    "ethers": "^5.5.1",
+    "fs": "^0.0.1-security"
+  }
+}

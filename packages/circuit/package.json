@@ -1,0 +1,15 @@
+{
+  "name": "@list/circuit",
+  "version": "1.0.0",
+  "description": "sparse merkle tree verification circuit",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "circomlib": "^2.0.3"
+  },
+    "scripts": {
+    "compile": "circom smt.circom --r1cs --wasm --sym",
+    "archive": "git archive -o cli.zip HEAD"
+  }
+}

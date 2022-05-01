@@ -1,5 +1,5 @@
 {
-  "name": "list",
+  "name": "@list/monorepo",
   "version": "1.0.0",
   "description": "list and zero knowledge proofs of inclusion and exclusion",
   "main": "index.js",
@@ -7,15 +7,15 @@
   "author": "Benjamin Herald",
   "license": "MIT",
   "private": true,
-  "workspaces": [
-   "contracts", 
-   "cli",
-   "config",
+  "workspaces": {
+  	"packages": [
    "packages/*"
-   ],
+   	]
+   },
    "scripts": {    
 	  "start": "yarn ",    
 	  "build": "yarn ",
+	  "sync": "yarn workspace @list/cli sync",
 	  "push": "git push -u origin master",
 	  "commit": "git commit -a -S -m"  
    }

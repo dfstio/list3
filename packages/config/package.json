@@ -1,0 +1,9 @@
+{
+  "name": "@list/config",
+  "version": "1.0.0",
+  "description": "configuration for list",
+  "main": "index.js",
+  "author": "Benjamind Herald",
+  "license": "MIT",
+  "private": true
+}

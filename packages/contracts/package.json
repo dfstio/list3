@@ -24,7 +24,6 @@
   },
   "scripts": {
     "balance": "hardhat balance",
-    "commit": "git commit -a -S -m",
     "archive": "git archive -o list-contracts.zip HEAD",
     "compile": "hardhat compile",
     "deploylist": "hardhat run --network mumbai  scripts/deploylist.js",
