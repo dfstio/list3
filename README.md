@@ -9,15 +9,15 @@ Proof contract is deployed to rinkeby network:
 
 ## Command line tools
 
-Sync list contract to proof contract:
+Sync list contract to proof contract:  
 yarn Sync
 
-Generate proof from list contract:
+Generate proof from list contract:  
 yarn proof <address> myproof.json
 
-Check proof on proof contract:
+Check proof on proof contract:  
 yarn verify myproof.json
 
-Add address to list contract:
+Add address to list contract:  
 yarn add <address> <IPFShash>
 
