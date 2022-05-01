@@ -10,11 +10,13 @@
   "workspaces": [
    "contracts", 
    "cli",
+   "config",
    "packages/*"
    ],
    "scripts": {    
 	  "start": "yarn ",    
 	  "build": "yarn ",
+	  "push": "git push -u origin master",
 	  "commit": "git commit -a -S -m"  
    }
 }
