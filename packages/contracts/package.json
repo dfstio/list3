@@ -1,0 +1,9 @@
+{
+  "name": "contracts",
+  "version": "1.0.0",
+  "description": "Ethereum contracts for list",
+  "main": "index.js",
+  "author": "Benjamin Herald",
+  "license": "MIT",
+  "private": true
+}
