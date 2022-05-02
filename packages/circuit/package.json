@@ -10,6 +10,17 @@
   },
     "scripts": {
     "compile": "circom smt.circom --r1cs --wasm --sym",
-    "archive": "git archive -o cli.zip HEAD"
+    "archive": "git archive -o cli.zip HEAD",
+    "ceremony1": "snarkjs powersoftau new bn128 12 pot12_0000.ptau -v",
+    "ceremony2": "snarkjs powersoftau contribute pot12_0000.ptau pot12_0001.ptau --name=FirstContribution -v",
+    "ceremony3": "snarkjs powersoftau prepare phase2 pot12_0001.ptau pot12_final.ptau -v",
+    "ceremony4": "snarkjs groth16 setup smt.r1cs pot12_final.ptau smt_0000.zkey",
+    "ceremony5": "snarkjs zkey contribute smt_0000.zkey smt_0001.zkey --name=SecondContribution -v",
+    "ceremony6": "snarkjs zkey export verificationkey smt_0001.zkey verification_key.json",
+    "solidity": "snarkjs zkey export solidityverifier smt_0001.zkey verifier.sol",
+    "generatecall": "snarkjs zkesc public.json proof.json",
+    "witness": "node ./smt_js/generate_witness.js ./smt_js/smt.wasm ./input.json witness.wtns",
+    "proof": "snarkjs g16p smt_0001.zkey witness.wtns proof.json public.json",
+    "verify": "snarkjs g16v verification_key.json public.json proof.json"    
   }
 }

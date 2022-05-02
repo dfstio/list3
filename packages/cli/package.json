@@ -6,6 +6,7 @@
   "license": "MIT",
   "scripts": {
     "sync": "node sync.js",
+    "verify": "node verify.js",
     "archive": "git archive -o cli.zip HEAD"
   },
   "dependencies": {

@@ -32,6 +32,7 @@
     "accounts": "hardhat accounts",
     "verifyverifier": "hardhat etherscan-verify --network rinkeby --api-key FQ1NYZXPQIICKE7U41VSRB7TPKZJQKI7SH",
     "verifylist": "hardhat verify --network mumbai 0x355bd8a9898751b779bf621650d70eea93fd65ec",
+    "verify": "hardhat verify --network rinkeby 0x355Bd8a9898751b779Bf621650d70eEa93FD65eC",
     "test": "echo \"Error: no test specified\" && exit 1",
     "size": "hardhat size-contracts",
     "abi": "hardhat export-abi"

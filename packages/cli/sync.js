@@ -29,7 +29,37 @@ async function main()
 	 	await tree.insert(record.adr, record.version);
 	 }
 	 
-	 const result = await tree.find('0x8750A33948C11E21484fb21e9Ff2D0e238e8527f');
+	 const key = '0x8750A33948C11E21484fb21e9Ff2D0e238e8527f';
+	 const result = await tree.find(key);
 	 console.log("Tree root", tree.root, "found", result);
+	 await testInclusion(tree, key);
 	 
 };
+
+
+
+async function testInclusion(tree, _key) 
+{
+    const key = tree.F.e(_key);
+    const res = await tree.find(key);
+
+    console.log("testInclusion res.found", res.found, "for key", _key);
+    let siblings = res.siblings;
+    for (let i=0; i<siblings.length; i++) siblings[i] = tree.F.toObject(siblings[i]);
+    while (siblings.length<10) siblings.push(0);
+
+    const input = {
+			enabled: 1,
+			fnc: 0,
+			root: tree.F.toObject(tree.root),
+			siblings: siblings,
+			oldKey: 0,
+			oldValue: 0,
+			isOld0: 0,
+			key: tree.F.toObject(key),
+			value: tree.F.toObject(res.foundValue)
+		};
+
+    
+    console.log("Input is: ", JSON.stringify(input, (_, v) => typeof v === 'bigint' ? v.toString() : v));
+}

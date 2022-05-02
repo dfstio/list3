@@ -1,7 +1,7 @@
 # List
 list and zero knowledge proofs of inclusion and exclusion
 
-## Config
+## Configuration
 
 git clone https://github.com/Benjamin-Herald/list
 
@@ -9,6 +9,9 @@ Put index.js file with configuration into packages/config directory
 and private_deployer.json into packages/contracts directory
 
 Run yarn from list directory
+
+In case you plan to change circuit, install circom using 
+https://docs.circom.io/getting-started/installation/
 
 ## Contracts
 
@@ -20,8 +23,8 @@ https://mumbai.polygonscan.com/address/0xD7737dDf725f5006cCc682b337b4cc4dfd5c04f
 
 
 
-Verifier contract is deployed to rinkeby network at address
-
+Verifier contract is deployed to rinkeby network at address 0x355Bd8a9898751b779Bf621650d70eEa93FD65eC
+https://rinkeby.etherscan.io/address/0x355bd8a9898751b779bf621650d70eea93fd65ec
 
 ### Usage:
 

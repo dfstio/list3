@@ -1,0 +1,51 @@
+Arguments: 
+  /usr/local/bin/node /Users/mike/.yarn/bin/yarn.js ceremony1
+
+PATH: 
+  /Users/mike/.yarn/bin:/Users/mike/.config/yarn/global/node_modules/.bin:/opt/local/bin:/opt/local/sbin:/Users/mike/.pyenv/shims:/Users/mike/.pyenv/shims:/Library/Frameworks/Python.framework/Versions/3.10/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/VMware Fusion.app/Contents/Public:/usr/local/go/bin:/usr/local/MacGPG2/bin:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/Users/mike/.cargo/bin
+
+Yarn version: 
+  1.22.15
+
+Node version: 
+  16.14.2
+
+Platform: 
+  darwin x64
+
+Trace: 
+  SyntaxError: /Users/mike/Documents/Tradle/list/packages/circuit/package.json: Unexpected token F in JSON at position 503
+      at JSON.parse (<anonymous>)
+      at /Users/mike/.yarn/lib/cli.js:1625:59
+      at Generator.next (<anonymous>)
+      at step (/Users/mike/.yarn/lib/cli.js:310:30)
+      at /Users/mike/.yarn/lib/cli.js:321:13
+
+npm manifest: 
+  {
+    "name": "@list/circuit",
+    "version": "1.0.0",
+    "description": "sparse merkle tree verification circuit",
+    "main": "index.js",
+    "license": "MIT",
+    "private": true,
+    "dependencies": {
+      "circomlib": "^2.0.3"
+    },
+      "scripts": {
+      "compile": "circom smt.circom --r1cs --wasm --sym",
+      "archive": "git archive -o cli.zip HEAD",
+      "ceremony1": "snarkjs powersoftau new bn128 12 pot12_0000.ptau -v",
+      "ceremony2": "snarkjs powersoftau contribute pot12_0000.ptau pot12_0001.ptau --name="First contribution" -v",
+      "ceremony3": "snarkjs powersoftau prepare phase2 pot12_0001.ptau pot12_final.ptau -v",
+      "ceremony4": "snarkjs groth16 setup smt.r1cs pot12_final.ptau smt_0000.zkey",
+      "ceremony5": "snarkjs zkey contribute smt_0000.zkey smt_0001.zkey --name="1st Contributor Name" -v",
+      "ceremony6": "snarkjs zkey export verificationkey smt_0001.zkey smt_verification_key.json"    
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
