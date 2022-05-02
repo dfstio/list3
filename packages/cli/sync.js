@@ -38,7 +38,7 @@ async function main()
 
 
 
-async function testInclusion(tree, _key) 
+async function generateInput(tree, _key) 
 {
     const key = tree.F.e(_key);
     const res = await tree.find(key);

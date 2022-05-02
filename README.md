@@ -5,8 +5,8 @@ list and zero knowledge proofs of inclusion and exclusion
 
 git clone https://github.com/Benjamin-Herald/list
 
-Put index.js file with configuration into packages/config directory
-and private_deployer.json into packages/contracts directory
+Put listconfig.js file with configuration into packages/config directory using template as example
+
 
 Run yarn from list directory
 
@@ -16,15 +16,16 @@ https://docs.circom.io/getting-started/installation/
 ## Contracts
 
 List contract is deployed to mumbai network at address 0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb  
-Implementation contract is deployed to:  
+Implementation contracts are deployed to:  
 v1:  0x355bd8a9898751b779bf621650d70eea93fd65ec
+v2:  0xbDEBAb0a14CDa02c196bDC2C2490D96d3DfC6a61
 
 https://mumbai.polygonscan.com/address/0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb
 
 
 
-Verifier contract is deployed to rinkeby network at address 0x355Bd8a9898751b779Bf621650d70eEa93FD65eC
-https://rinkeby.etherscan.io/address/0x355bd8a9898751b779bf621650d70eea93fd65ec
+Verifier contract is deployed to rinkeby network at address 0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb
+https://rinkeby.etherscan.io/address/0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb
 
 ### Usage:
 
@@ -47,5 +48,9 @@ Add address to list contract:
 yarn add <address> <IPFShash>
 
 ## TODO
-- Allow to call list.add from any address using gasless OpenZeppelin Defender Relayer  
-with condition that calling address is equal to address in parameters
+- Write template config
+- AWS lambda
+- IPFS
+- Sync
+- Scripts on monorepo level
+- Goals

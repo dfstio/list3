@@ -13,9 +13,12 @@ async function main() {
   // manually to make sure everything is compiled
   // await hre.run('compile');
 
+  const accounts = await hre.ethers.getSigners();
+  const owner = accounts[0].address;
+  console.log("Deployer address:", owner);
   // We get the contract to deploy
   const Verifier = await hre.ethers.getContractFactory("Verifier");
-  const verifier = await Verifier.deploy();
+  const verifier = await Verifier.deploy(owner);
 
   await verifier.deployed();
 

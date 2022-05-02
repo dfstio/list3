@@ -162,6 +162,27 @@ library Pairing {
     }
 }
 contract Verifier {
+
+    address private immutable _owner;
+    uint public root;
+    event Root(uint256 _root);
+
+    constructor(address owner) public {
+        _owner = owner;
+    }
+
+    function setroot( uint _root)
+		 external 
+	{
+	     require(msg.sender == _owner, "not a owner"); 
+		 root = _root;
+		 emit Root(_root );			 
+	}
+
+
+
+
+
     using Pairing for *;
     struct VerifyingKey {
         Pairing.G1Point alfa1;
@@ -194,26 +215,49 @@ contract Verifier {
              8495653923123431417604973247489272438418190587263600148770280649306958101930]
         );
         vk.delta2 = Pairing.G2Point(
-            [16723159440101169593411600524996743106197787177170941782405932998941287179639,
-             18260774838909518186643730761751466453089958748011471854870261933803113279549],
-            [19458086330997958012006641792241636772870060115737608139214282424922351965696,
-             7274763546556640091706101082240320743973506794864574768306628395923529207799]
+            [10083499991514411589189789459388439425550908267703324187205681586870412346083,
+             10043690487605698192170410904680129621537508954080019833443756919699771194580],
+            [8052616649795942660770283723123868362054875376771094817305197766406635136754,
+             2764926560231196737937538268100231772672447531468296835674048314056174350725]
         );
-        vk.IC = new Pairing.G1Point[](1);
+        vk.IC = new Pairing.G1Point[](5);
         
         vk.IC[0] = Pairing.G1Point( 
             5716033231150045247660928860374392043013085704314799592415240400203211302569,
             6182028002157113378870327572947130176657973040988237950567955611057695993132
         );                                      
         
+        vk.IC[1] = Pairing.G1Point( 
+            5486949265318617100280535599439171993311684483014980111862450482996648164113,
+            7005924422649179731703649869712403509142183001753162020220395383926715134213
+        );                                      
+        
+        vk.IC[2] = Pairing.G1Point( 
+            1861793256370730147227869667208291504919757153377430312672216918767415658362,
+            16773026304438272182678788242067425246159966177228643372697295995771933242097
+        );                                      
+        
+        vk.IC[3] = Pairing.G1Point( 
+            17766138635000096233591023473952723660221622077232208863495395516764654107959,
+            1625860035533857017039214184281765608992483409390061282185857425286055579126
+        );                                      
+        
+        vk.IC[4] = Pairing.G1Point( 
+            810620303640624983736411914920396132058553921343188001377351431022449837702,
+            11875725115752773330779829685269449314943731841652663662858590909728731468717
+        );                                      
+        
     }
-    function verify(Proof memory proof) internal view returns (uint) {
+    function verify(uint[] memory input, Proof memory proof) internal view returns (uint) {
         uint256 snark_scalar_field = 21888242871839275222246405745257275088548364400416034343698204186575808495617;
         VerifyingKey memory vk = verifyingKey();
-        require( 1 == vk.IC.length,"verifier-bad-input");
+        require(input.length + 1 == vk.IC.length,"verifier-bad-input");
         // Compute the linear combination vk_x
         Pairing.G1Point memory vk_x = Pairing.G1Point(0, 0);
-
+        for (uint i = 0; i < input.length; i++) {
+            require(input[i] < snark_scalar_field,"verifier-gte-snark-scalar-field");
+            vk_x = Pairing.addition(vk_x, Pairing.scalar_mul(vk.IC[i + 1], input[i]));
+        }
         vk_x = Pairing.addition(vk_x, vk.IC[0]);
         if (!Pairing.pairingProd4(
             Pairing.negate(proof.A), proof.B,
@@ -227,14 +271,19 @@ contract Verifier {
     function verifyProof(
             uint[2] memory a,
             uint[2][2] memory b,
-            uint[2] memory c
+            uint[2] memory c,
+            uint[4] memory input
         ) public view returns (bool r) {
+        require(root == input[0], "wrong root - please regenerate proof"); 
         Proof memory proof;
         proof.A = Pairing.G1Point(a[0], a[1]);
         proof.B = Pairing.G2Point([b[0][0], b[0][1]], [b[1][0], b[1][1]]);
         proof.C = Pairing.G1Point(c[0], c[1]);
-
-        if (verify( proof) == 0) {
+        uint[] memory inputValues = new uint[](input.length);
+        for(uint i = 0; i < input.length; i++){
+            inputValues[i] = input[i];
+        }
+        if (verify(inputValues, proof) == 0) {
             return true;
         } else {
             return false;

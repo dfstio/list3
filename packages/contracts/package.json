@@ -19,6 +19,7 @@
     "hardhat-contract-sizer": "^2.5.1"
   },
   "dependencies": {
+  	"@list/config": "1.0.0",
     "@openzeppelin/contracts-upgradeable": "^4.5.2",
     "chalk": "^5.0.0"
   },
@@ -31,7 +32,7 @@
     "upgradelist": "hardhat run --network mumbai scripts/upgradelist.js",
     "accounts": "hardhat accounts",
     "verifyverifier": "hardhat etherscan-verify --network rinkeby --api-key FQ1NYZXPQIICKE7U41VSRB7TPKZJQKI7SH",
-    "verifylist": "hardhat verify --network mumbai 0x355bd8a9898751b779bf621650d70eea93fd65ec",
+    "verifylist": "hardhat verify --network mumbai 0xbDEBAb0a14CDa02c196bDC2C2490D96d3DfC6a61",
     "verify": "hardhat verify --network rinkeby 0x355Bd8a9898751b779Bf621650d70eEa93FD65eC",
     "test": "echo \"Error: no test specified\" && exit 1",
     "size": "hardhat size-contracts",

@@ -11,7 +11,9 @@ require('hardhat-abi-exporter');
 
 const defaultNetwork = "mumbai"; // "localhost";  "mumbai";
 const { isAddress, getAddress, formatUnits, parseUnits } = utils;
-const { privateKey } = require('./private_deployer.json');
+const {KEY } = require('@list/config');
+const  privateKey  = KEY;
+//const { privateKey } = require('./private_deployer.json');
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html

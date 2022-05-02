@@ -111,7 +111,7 @@ contract List is Initializable,
 			 external whenNotPaused onlyModerator
 		 { 
 			  records.push();
-			  uint counter = records.length - 1;
+			  uint256 counter = records.length - 1;
 			  records[counter].adr = to ;
 			  records[counter].version = version ;
 			  records[counter].hash = hash ;
@@ -121,34 +121,66 @@ contract List is Initializable,
 			  emit Version(to, version, hash);
 		 }
   
+  		 function addMe(uint256 version, string memory hash)
+			 external whenNotPaused
+		 { 
+			  address to = _msgSender();
+			  records.push();
+			  uint256 counter = records.length - 1;
+			  records[counter].adr = to ;
+			  records[counter].version = version ;
+			  records[counter].hash = hash ;
+		  
+			  versions[to] = counter; 
+
+			  emit Version(to, version, hash);
+		 }
+  
+		 function getVersion( address adr)
+			  external view returns (uint256)
+		 {
+			  uint256 counter = versions[adr];
+			  if( counter == 0 ) return 0;
+			  else return records[counter].version;			  
+		 }
+
+		   
+		 function getHash( address adr)
+			  external view returns (string memory)
+		 {
+			  uint256 counter = versions[adr];
+			  if( counter == 0 ) return "";
+			  else return records[counter].hash;			  
+		 }
+
 
   
-		function getRecordsCount()
-			 external view returns (uint)
-		{
-			 return records.length;
-		}
+		 function getRecordsCount()
+			  external view returns (uint256)
+		 {
+			  return records.length;
+		 }
 	
 
-		function pause()
-			 external whenNotPaused onlyOwner
-		{
-			 _pause(); 
-		}
-
-		function unpause()
-			 external whenPaused onlyOwner
+		 function pause()
+			  external whenNotPaused onlyOwner
 		 {
-			 _unpause(); 
+			  _pause(); 
 		 }
+
+		 function unpause()
+			  external whenPaused onlyOwner
+		  {
+			  _unpause(); 
+		  }
 		 
-		 function sync(	 uint256 _roothash )
-			 external whenNotPaused onlyOwner
-		{
-			 roothash = _roothash;
-			 syncCounter = records.length;
-			 emit Sync(_roothash, syncCounter );			 
-		}
+		  function sync(	 uint256 _roothash )
+			  external whenNotPaused onlyOwner
+		 {
+			  roothash = _roothash;
+			  syncCounter = records.length;
+			  emit Sync(_roothash, syncCounter );			 
+		 }
 
   
 }
