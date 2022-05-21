@@ -4,6 +4,19 @@
     "inputs": [
       {
         "indexed": false,
+        "internalType": "bytes",
+        "name": "message",
+        "type": "bytes"
+      }
+    ],
+    "name": "MessageSent",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
         "internalType": "address",
         "name": "_address",
         "type": "address"
@@ -11,7 +24,7 @@
       {
         "indexed": false,
         "internalType": "bool",
-        "name": "_status",
+        "name": "status",
         "type": "bool"
       }
     ],
@@ -56,13 +69,38 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_roothash",
+        "name": "permalink",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "hash",
+        "type": "string"
+      }
+    ],
+    "name": "Revoke",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "roothash",
         "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_syncCounter",
+        "name": "syncCounter",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "blockNumber",
         "type": "uint256"
       }
     ],
@@ -86,21 +124,21 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "_address",
-        "type": "address"
-      },
-      {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_version",
+        "name": "permalink",
         "type": "uint256"
       },
       {
         "indexed": false,
+        "internalType": "uint64",
+        "name": "version",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
         "internalType": "string",
-        "name": "_hash",
+        "name": "hash",
         "type": "string"
       }
     ],
@@ -110,18 +148,18 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
         "internalType": "uint256",
-        "name": "version",
+        "name": "permalink",
         "type": "uint256"
       },
       {
+        "internalType": "uint64",
+        "name": "version",
+        "type": "uint64"
+      },
+      {
         "internalType": "string",
-        "name": "hash",
+        "name": "ipfsHash",
         "type": "string"
       }
     ],
@@ -131,29 +169,24 @@
     "type": "function"
   },
   {
-    "inputs": [
+    "inputs": [],
+    "name": "blockNumber",
+    "outputs": [
       {
         "internalType": "uint256",
-        "name": "version",
+        "name": "",
         "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "hash",
-        "type": "string"
       }
     ],
-    "name": "addMe",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "adr",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "permalink",
+        "type": "uint256"
       }
     ],
     "name": "getHash",
@@ -228,17 +261,17 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "adr",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "permalink",
+        "type": "uint256"
       }
     ],
     "name": "getVersion",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "uint64",
         "name": "",
-        "type": "uint256"
+        "type": "uint64"
       }
     ],
     "stateMutability": "view",
@@ -249,6 +282,25 @@
     "name": "initialize",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "permalink",
+        "type": "uint256"
+      }
+    ],
+    "name": "isRevoked",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -333,18 +385,23 @@
     "name": "records",
     "outputs": [
       {
-        "internalType": "address",
-        "name": "adr",
-        "type": "address"
-      },
-      {
         "internalType": "uint256",
-        "name": "version",
+        "name": "permalink",
         "type": "uint256"
       },
       {
+        "internalType": "uint64",
+        "name": "version",
+        "type": "uint64"
+      },
+      {
+        "internalType": "bool",
+        "name": "isRevoked",
+        "type": "bool"
+      },
+      {
         "internalType": "string",
-        "name": "hash",
+        "name": "ipfsHash",
         "type": "string"
       }
     ],
@@ -354,6 +411,24 @@
   {
     "inputs": [],
     "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "permalink",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "ipfsHash",
+        "type": "string"
+      }
+    ],
+    "name": "revoke",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -394,6 +469,11 @@
       {
         "internalType": "uint256",
         "name": "_roothash",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_syncCounter",
         "type": "uint256"
       }
     ],
@@ -438,9 +518,9 @@
   {
     "inputs": [
       {
-        "internalType": "address",
+        "internalType": "uint256",
         "name": "",
-        "type": "address"
+        "type": "uint256"
       }
     ],
     "name": "versions",

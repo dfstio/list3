@@ -9,7 +9,6 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/metatx/ERC2771ContextUpgradeable.sol";
 
 
-
 contract List is Initializable, 
 					OwnableUpgradeable, 
 						PausableUpgradeable, 
@@ -17,24 +16,29 @@ contract List is Initializable,
 {
 
 	 struct Record {
-			address adr;
-			uint256 version;
-			string hash;
+			uint256 permalink;
+			uint64 version;
+			bool isRevoked; 
+			string ipfsHash; // additional information, if any 
 		}
+		
+	 // Sync roothash to Ethereum mainnet
+	  uint256 public roothash; // roothash of SMT tree
+	  uint256 public syncCounter; // number of leafs in SMT tree
+	  uint public blockNumber;	  // block number when roothash was updated		
+	  event MessageSent(bytes message); // send message to Ethereum mainnet
+
 
 	  // Address properties
-	  mapping(address => uint256) public versions;
+	  mapping(uint256 => uint256) public versions; // permalink => last Record 
 	  Record[] public records;  
-	 
-	 // Verifier sync
-	  uint256 public roothash;
-	  uint256 public syncCounter;
 	 
 
 	  // Events
-	  event Version(address indexed _address, uint256  _version, string _hash);
-	  event Sync(uint256 _roothash, uint256 _syncCounter);
-	  event ModeratorChanged(address _address, bool _status);
+	  event Version(uint256 permalink, uint64  version, string hash);
+	  event Revoke(uint256 permalink, string hash);
+	  event Sync(uint256 roothash, uint256 syncCounter, uint blockNumber);
+	  event ModeratorChanged(address _address, bool status);
 
 	  // Moderator accounts
 	  mapping(address => bool) public moderator;
@@ -74,7 +78,7 @@ contract List is Initializable,
 	   function getListVersion() public pure
 		   returns (uint256)
 	   {
-			   return 100; // 100 = version 1.00
+			   return 210; // 210 = version 2.10
 	   }
    
 
@@ -107,54 +111,60 @@ contract List is Initializable,
   
  
   
-		 function add(address to, uint256 version, string memory hash)
+		 function add(uint256 permalink, uint64 version, string memory ipfsHash)
+			 external whenNotPaused onlyModerator
+		 { 
+
+			  uint256 index = versions[permalink];
+			  require(records[index].isRevoked == false, "LIST02: permalink is already revoked"); 
+			  require((version - records[index].version) == 1, "LIST03: version increment must be 1"); 
+
+			  records.push();
+			  uint256 counter = records.length - 1;
+			  records[counter].permalink = permalink ;
+			  records[counter].version = version ;
+			  records[counter].ipfsHash = ipfsHash ;
+		  
+			  versions[permalink] = counter; 
+
+			  emit Version(permalink, version, ipfsHash);
+		 }
+  
+		 function revoke(uint256 permalink, string memory ipfsHash)
 			 external whenNotPaused onlyModerator
 		 { 
 			  records.push();
 			  uint256 counter = records.length - 1;
-			  records[counter].adr = to ;
-			  records[counter].version = version ;
-			  records[counter].hash = hash ;
+			  records[counter].permalink = permalink ;
+			  records[counter].isRevoked = true ;
+			  records[counter].ipfsHash = ipfsHash ;
 		  
-			  versions[to] = counter; 
+			  versions[permalink] = counter; 
 
-			  emit Version(to, version, hash);
+			  emit Revoke(permalink, ipfsHash);
 		 }
-  
-  		 function addMe(uint256 version, string memory hash)
-			 external whenNotPaused
-		 { 
-			  address to = _msgSender();
-			  records.push();
-			  uint256 counter = records.length - 1;
-			  records[counter].adr = to ;
-			  records[counter].version = version ;
-			  records[counter].hash = hash ;
-		  
-			  versions[to] = counter; 
 
-			  emit Version(to, version, hash);
-		 }
   
-		 function getVersion( address adr)
-			  external view returns (uint256)
+		 function getVersion(uint256 permalink)
+			  external view returns (uint64)
 		 {
-			  uint256 counter = versions[adr];
-			  if( counter == 0 ) return 0;
-			  else return records[counter].version;			  
+			  return records[versions[permalink]].version;			  
+		 }
+		 
+		 function isRevoked(uint256 permalink)
+			  external view returns (bool)
+		 {
+			  return records[versions[permalink]].isRevoked;			  
 		 }
 
 		   
-		 function getHash( address adr)
+		 function getHash( uint256 permalink)
 			  external view returns (string memory)
 		 {
-			  uint256 counter = versions[adr];
-			  if( counter == 0 ) return "";
-			  else return records[counter].hash;			  
+			return records[versions[permalink]].ipfsHash;			  
 		 }
 
 
-  
 		 function getRecordsCount()
 			  external view returns (uint256)
 		 {
@@ -174,13 +184,16 @@ contract List is Initializable,
 			  _unpause(); 
 		  }
 		 
-		  function sync(	 uint256 _roothash )
+		 function sync(	 uint256 _roothash, uint256 _syncCounter )
 			  external whenNotPaused onlyOwner
 		 {
+		 	  require(_syncCounter > syncCounter, "LIST04: syncCounter is low"); 
 			  roothash = _roothash;
-			  syncCounter = records.length;
-			  emit Sync(_roothash, syncCounter );			 
+			  syncCounter = _syncCounter ; //
+			  blockNumber = block.number;
+			  emit MessageSent(abi.encode(roothash, syncCounter, blockNumber));
+			  emit Sync(roothash, syncCounter, blockNumber );			 
 		 }
-
+		 
   
 }

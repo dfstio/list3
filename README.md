@@ -15,14 +15,19 @@ https://docs.circom.io/getting-started/installation/
 
 ## Contracts
 
-List contract is deployed to mumbai network at address 0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb  
+List contract v 1 is deployed to mumbai network at address 0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb  
 Implementation contracts are deployed to:  
 v1:  0x355bd8a9898751b779bf621650d70eea93fd65ec
 v2:  0xbDEBAb0a14CDa02c196bDC2C2490D96d3DfC6a61
 
 https://mumbai.polygonscan.com/address/0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb
 
+List contract v 2 is deployed to mumbai network at address 0x572aC98bDea8950f348d2C66945d4E5312B35bbe  
+Implementation contracts are deployed to:  
+v1:  0xd58bf69dabcaefe8d1ead6327190ff215f5b0c3f
 
+
+https://mumbai.polygonscan.com/address/0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb
 
 Verifier contract is deployed to rinkeby network at address 0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb
 https://rinkeby.etherscan.io/address/0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb
@@ -48,6 +53,11 @@ Add address to list contract:
 yarn add <address> <IPFShash>
 
 ## TODO
+
+- Add SMT roothash calculation in the contract
+- Add ZK proof verification on add and revoke functions
+
+
 - Write template config
 - AWS lambda
 - IPFS

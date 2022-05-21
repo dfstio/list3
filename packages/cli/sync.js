@@ -1,11 +1,13 @@
 
-const {RPC_RINKEBY, RPC_MUMBAI, KEY, CONTRACT_ADDRESS } = require('@list/config');
+const {RPC_RINKEBY, RPC_MUMBAI, KEY, LIST_CONTRACT_ADDRESS } = require('@list/config');
 const ListJSON = require("../contracts/abi/contracts/list.sol/List.json");
 const ethers = require("ethers");
 const newMemEmptyTrie = require("circomlibjs").newMemEmptyTrie;
 
 const provider = new ethers.providers.StaticJsonRpcProvider(RPC_MUMBAI);
-const list = new ethers.Contract(CONTRACT_ADDRESS, ListJSON, provider);
+const wallet = new ethers.Wallet(KEY);
+const signer = wallet.connect(provider);
+const list = new ethers.Contract(LIST_CONTRACT_ADDRESS, ListJSON, signer);
 
 
 
@@ -26,16 +28,22 @@ async function main()
 	 {
 	 	const record = await list.records(i);
 	 	console.log("Record %d", i, record);
-	 	await tree.insert(record.adr, record.version);
+	 	await tree.insert(i, record.version);
 	 }
 	 
-	 const key1 = '0x8750A33948C11E21484fb21e9Ff2D0e238e8527f';
-	 const key2 = '0xbDEBAb0a14CDa02c196bDC2C2490D96d3DfC6a61';
-
 	 console.log("Tree root", tree.root);
+	 await list.sync(tree.root, count);
+	 
+	 
+	 
+/*
+	 const key1 = '277';
+	 const key2 = '300';
+
+
 	 await generateInput(tree, key1);
 	 await generateInput(tree, key2);
-	 
+*/	 
 };
 
 
