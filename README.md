@@ -54,3 +54,4 @@ yarn add <address> <IPFShash>
 - Sync
 - Scripts on monorepo level
 - Goals
+- Previous root in Verifier 
