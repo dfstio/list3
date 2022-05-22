@@ -25,6 +25,7 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 			   uint256 roothash; 	// roothash of the SMT
 			   uint256 counter; 	// number of updates in SMT
 			   uint256 timestamp; 	// timestamp of roothash update
+			   string ipfsHash; 	// IPFS hash of JSON configuration file describing relay API access
 		}	
 	 
 		Relay[] public relays; // relays numbering starts from 1, relay[0] is empty
@@ -39,7 +40,8 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 		event Version(uint256 indexed permalink, uint128 indexed version, uint128 indexed relayId); // new version recorded
 		event Roothash(uint256 indexed roothash, uint256 timestamp, uint128 indexed relayId); // Relay's roothash changed
 		event RelayAdded(address indexed relayAddress, uint128 indexed relayId); // Added new relay
-
+		event Transfer(uint256 indexed permalink, uint128 indexed fromRelayId, uint128 indexed toRelayId);
+		event RelayConfig(uint128 indexed relayId, string ipfsHash); 
 
 		function initialize() public initializer {
 			 __Ownable_init();
@@ -78,7 +80,15 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 			  emit RelayAdded(to, relayId);
 			  emit Roothash( 0, relays[relayId].timestamp, relayId);
 		 }
-   
+  
+  		 function setRelayConfig(string memory ipfsHash)
+			 external whenNotPaused onlyRelay
+		 { 
+			  uint128 relayId = relaysIndex[msg.sender];			  
+			  relays[relayId].ipfsHash = ipfsHash;
+			  emit RelayConfig(relayId, ipfsHash); 
+		 }
+ 
   
 		 function add(  uint256 permalink, 
 		 				uint128 version,
@@ -100,6 +110,7 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 			  versions[permalink].relayId = relayId;
 			  emit Version(permalink, version, relayId); 
 		 }
+		 
 		 
 		 function update(	uint256 permalink, 
 		 					uint128 version,
@@ -178,7 +189,8 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 			  emit Roothash( oldRelayNewRoot, relays[relayId].timestamp, relayId);
 
 			  versions[permalink].relayId = newRelayId;
-			  emit Version(permalink, versions[permalink].version, newRelayId);  	
+			  emit Version(permalink, versions[permalink].version, newRelayId);  
+			  emit Transfer(permalink, relayId, newRelayId); // relays should ping after the transfer to confirm the state	
 		 }
 
 		 // Confirm that roothash is not changed
