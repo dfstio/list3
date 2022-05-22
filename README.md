@@ -13,6 +13,8 @@ Run yarn from list directory
 In case you plan to change circuit, install circom using 
 https://docs.circom.io/getting-started/installation/
 
+Faucet: https://goerlifaucet.com/
+
 ## Contracts
 
 List contract v 1 is deployed to mumbai network at address 0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb  
@@ -28,6 +30,10 @@ v1:  0xd58bf69dabcaefe8d1ead6327190ff215f5b0c3f
 
 
 https://mumbai.polygonscan.com/address/0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb
+
+
+ListHash deployed to Goerli: 0x355Bd8a9898751b779Bf621650d70eEa93FD65eC
+https://goerli.etherscan.io/address/0x355bd8a9898751b779bf621650d70eea93fd65ec#code
 
 Verifier contract is deployed to rinkeby network at address 0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb
 https://rinkeby.etherscan.io/address/0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb

@@ -11,8 +11,8 @@ require('hardhat-abi-exporter');
 
 const defaultNetwork = "mumbai"; // "localhost";  "mumbai";
 const { isAddress, getAddress, formatUnits, parseUnits } = utils;
-const {KEY } = require('@list/config');
-const  privateKey  = KEY;
+const {KEY_OWNER, RPC_RINKEBY, RPC_GOERLI, RPC_MUMBAI, KEY_ETHERSCAN, KEY_MUMBAI } = require('@list/config');
+const  privateKey  = KEY_OWNER;
 //const { privateKey } = require('./private_deployer.json');
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -66,9 +66,17 @@ module.exports = {
       */
     },
     rinkeby: {
-      url: "https://eth-rinkeby.alchemyapi.io/v2/o1zy9B4CvgTsH_dHr9nTia4ZTPypCpR0",
+      url: RPC_RINKEBY,
       //"https://rpc-mainnet.maticvigil.com/",
       chainId: 4,
+      gas:"auto",
+      gasMultiplier:2,
+      accounts: [privateKey]
+    },
+    goerli: {
+      url: RPC_GOERLI,
+      //"https://rpc-mainnet.maticvigil.com/",
+      chainId: 5,
       gas:"auto",
       gasMultiplier:2,
       accounts: [privateKey]
@@ -76,7 +84,6 @@ module.exports = {
 
     polygon: {
       url: "",
-      //"https://rpc-mainnet.maticvigil.com/",
       chainId: 137,
       gas:"auto",
       gasMultiplier:2,
@@ -84,7 +91,8 @@ module.exports = {
       accounts: [privateKey]
     },
     mumbai: {
-      url: "https://polygon-mumbai.g.alchemy.com/v2/BwVbde2aMs_mNN8KLFIZl6037vvZMAnH", //"https://rpc-mumbai.maticvigil.com", 
+      url: RPC_MUMBAI,
+      chainId: 80001, 
       gas:"auto",
       gasMultiplier:2,
       forwarder:  0x4d4581c01A457925410cd3877d17b2fd4553b2C5,
@@ -92,9 +100,11 @@ module.exports = {
     },
   },
   etherscan: {
-    // Your API key for Etherscan
-    // Obtain one at https://etherscan.io/
-    apiKey: "FQ1NYZXPQIICKE7U41VSRB7TPKZJQKI7SH" //"FQ1NYZXPQIICKE7U41VSRB7TPKZJQKI7SH"
+      apiKey: {
+      rinkeby: KEY_ETHERSCAN,
+      goerli: KEY_ETHERSCAN,
+      polygonMumbai: KEY_MUMBAI
+    }
   },
   solidity: {
     compilers: [

@@ -37,7 +37,7 @@ contract List is Initializable,
 	  // Events
 	  event Version(uint256 permalink, uint64  version, string hash);
 	  event Revoke(uint256 permalink, string hash);
-	  event Sync(uint256 roothash, uint256 syncCounter, uint blockNumber);
+	  event Sync(uint256 roothash, uint256 syncCounter, uint timestamp);
 	  event ModeratorChanged(address _address, bool status);
 
 	  // Moderator accounts
@@ -190,9 +190,9 @@ contract List is Initializable,
 		 	  require(_syncCounter > syncCounter, "LIST04: syncCounter is low"); 
 			  roothash = _roothash;
 			  syncCounter = _syncCounter ; //
-			  blockNumber = block.number;
-			  emit MessageSent(abi.encode(roothash, syncCounter, blockNumber));
-			  emit Sync(roothash, syncCounter, blockNumber );			 
+			  uint timestamp = block.timestamp;
+			  emit MessageSent(abi.encode(roothash, syncCounter, timestamp));
+			  emit Sync(roothash, syncCounter, timestamp );			 
 		 }
 		 
   

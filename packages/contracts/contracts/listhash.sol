@@ -146,10 +146,15 @@ contract ListHash {
      *  8 - branchMask - 32 bits denoting the path of receipt in merkle tree
      *  9 - receiptLogIndex - Log Index to read from the receipt
      */
-    function receiveMessage(bytes memory inputData) public view returns (bytes memory) {
+    function receiveMessage(bytes memory inputData) public view returns (bytes memory) 
+    {
         bytes memory message = _validateAndExtractMessage(inputData);
         return message;
     }
 
+    function parseMessage(bytes memory inputData) public view returns (uint256 roothash, uint256 syncCounter, uint timestamp) 
+    {
+        return abi.decode( receiveMessage(inputData), (uint256, uint256, uint));
+    }
 
 }

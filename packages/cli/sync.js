@@ -1,11 +1,11 @@
 
-const {RPC_RINKEBY, RPC_MUMBAI, KEY, LIST_CONTRACT_ADDRESS } = require('@list/config');
-const ListJSON = require("../contracts/abi/contracts/list.sol/List.json");
+const {RPC_RINKEBY, RPC_MUMBAI, KEY_OWNER, LIST_CONTRACT_ADDRESS } = require('@list/config');
+const ListJSON = require("@list/contracts/abi/contracts/list.sol/List.json");
 const ethers = require("ethers");
 const newMemEmptyTrie = require("circomlibjs").newMemEmptyTrie;
 
 const provider = new ethers.providers.StaticJsonRpcProvider(RPC_MUMBAI);
-const wallet = new ethers.Wallet(KEY);
+const wallet = new ethers.Wallet(KEY_OWNER);
 const signer = wallet.connect(provider);
 const list = new ethers.Contract(LIST_CONTRACT_ADDRESS, ListJSON, signer);
 
@@ -18,7 +18,7 @@ main();
 async function main()
 {
 	 const count = await list.getRecordsCount();
-	 console.log("Records: %d", count - 1);
+	 console.log("Records: %d", count);
 	 
 	 let tree;
 	 tree = await newMemEmptyTrie();
