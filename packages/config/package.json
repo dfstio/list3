@@ -1,6 +1,6 @@
 {
   "name": "@list/config",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "configuration for list",
   "main": "listconfig.js",
   "author": "Benjamind Herald",

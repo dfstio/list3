@@ -1,6 +1,6 @@
 {
   "name": "@list/contracts",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Ethereum contracts for list",
   "main": "index.js",
   "author": "Benjamin Herald",
@@ -19,7 +19,7 @@
     "hardhat-contract-sizer": "^2.5.1"
   },
   "dependencies": {
-    "@list/config": "1.0.0",
+    "@list/config": "3.0.0",
     "@maticnetwork/fx-portal": "fx-portal/contracts",
     "@openzeppelin/contracts-upgradeable": "^4.5.2",
     "chalk": "^5.0.0"

@@ -1,6 +1,6 @@
 {
   "name": "@list/circuit",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "sparse merkle tree verification circuit",
   "main": "index.js",
   "license": "MIT",

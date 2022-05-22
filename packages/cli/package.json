@@ -1,6 +1,6 @@
 {
   "name": "@list/cli",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "main": "index.js",
   "author": "Benjamin Herald",
   "license": "MIT",
@@ -11,8 +11,8 @@
     "archive": "git archive -o cli.zip HEAD"
   },
   "dependencies": {
-    "@list/config": "1.0.0",
-    "@list/contracts": "2.0.0",
+    "@list/config": "3.0.0",
+    "@list/contracts": "3.0.0",
     "@maticnetwork/maticjs": "^3.3.0",
     "@maticnetwork/maticjs-ethers": "^1.0.2",
     "@maticnetwork/maticjs-web3": "^1.0.1",

@@ -1,6 +1,6 @@
 {
   "name": "@list/monorepo",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "list and zero knowledge proofs of inclusion and exclusion",
   "main": "index.js",
   "repository": "https://github.com/Benjamin-Herald/list",
