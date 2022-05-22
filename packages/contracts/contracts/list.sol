@@ -1,177 +1,215 @@
 pragma solidity 0.8.9;
 //SPDX-License-Identifier: MIT
-// Version 1.00
+// Version 3.00
 
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/metatx/ERC2771ContextUpgradeable.sol";
 
 
-contract List is Initializable, 
-					OwnableUpgradeable, 
-						PausableUpgradeable, 
-							ERC2771ContextUpgradeable(0x4d4581c01A457925410cd3877d17b2fd4553b2C5)
+contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 {
-
-	 struct Record {
-			uint256 permalink;
-			uint64 version;
-			bool isRevoked; 
-			string ipfsHash; // additional information, if any 
-		}
+		// Version of the permalink object served by relay
+		struct ObjectVersion {
+			   uint128 version; // 0 - 1st version, 1 - revoked, >1 - version number
+			   uint128 relayId; // relayId of SMT tree relay responsible for permalink
+		   }
 		
-	 // Sync roothash to Ethereum mainnet
-	  uint256 public roothash; // roothash of SMT tree
-	  uint256 public syncCounter; // number of leafs in SMT tree
-	  uint public blockNumber;	  // block number when roothash was updated		
-	  event MessageSent(bytes message); // send message to Ethereum mainnet
-
-
-	  // Address properties
-	  mapping(uint256 => uint256) public versions; // permalink => last Record 
-	  Record[] public records;  
+		mapping(uint256 => ObjectVersion) versions; // permalink => Version
 	 
-
-	  // Events
-	  event Version(uint256 permalink, uint64  version, string hash);
-	  event Revoke(uint256 permalink, string hash);
-	  event Sync(uint256 roothash, uint256 syncCounter, uint timestamp);
-	  event ModeratorChanged(address _address, bool status);
-
-	  // Moderator accounts
-	  mapping(address => bool) public moderator;
-	  address[] private _moderators_list;
-
-     
-
-	  function initialize() public initializer {
-		   __Ownable_init();
-		   __Pausable_init();
-		   records.push();
-	   }
+		// Relays maintaining Sparse Merkle Trees ("SMT")
+		struct Relay {
+			   address relayAddress;
+			  // Sync roothash data to Ethereum mainnet
+			   uint256 roothash; 	// roothash of the SMT
+			   uint256 counter; 	// number of updates in SMT
+			   uint256 timestamp; 	// timestamp of roothash update
+		}	
+	 
+		Relay[] public relays; // relays numbering starts from 1, relay[0] is empty
+		uint128 public relaysCount; 
+		mapping(address => uint128) public relaysIndex; // relayAddress => index in relays[]
 	   
-	   function _msgSender() internal view override(ContextUpgradeable, ERC2771ContextUpgradeable)
-		   returns (address sender) {
-		   return ERC2771ContextUpgradeable._msgSender();
-	   }
+		// allowed transfers between relays
+		// relayId => permalink => roothash
+		mapping (uint128 => mapping(uint256 => uint256)) public allowedTransfers; 
 
-	   function _msgData() internal view override(ContextUpgradeable, ERC2771ContextUpgradeable)
-		   returns (bytes calldata) {
-		   return ERC2771ContextUpgradeable._msgData();
-	   }
+		// Events
+		event Version(uint256 indexed permalink, uint128 indexed version, uint128 indexed relayId); // new version recorded
+		event Roothash(uint256 indexed roothash, uint256 timestamp, uint128 indexed relayId); // Relay's roothash changed
+		event RelayAdded(address indexed relayAddress, uint128 indexed relayId); // Added new relay
 
-	   modifier onlyModerator() 
-	   {
-		   _isModerator();
-		   _;
-	   }
 
-	   function _isModerator() internal view 
-	   {
-		   require((moderator[_msgSender()] == true) , "LIST01: not a moderator"); 
-	   }
-  
-  
-   
-	   function getListVersion() public pure
-		   returns (uint256)
-	   {
-			   return 210; // 210 = version 2.10
-	   }
-   
-
-		function setModerator(address to, bool status)
-			 external onlyOwner
-		{
-			 if( status == true &&  moderator[to] == false)
-			 {
-				   _moderators_list.push();
-				   uint newModerator = _moderators_list.length - 1;
-				   _moderators_list[newModerator] = to ;
-			 }
-			 moderator[to] = status; 
-			 emit ModeratorChanged(to, status);
-		}
-  
-		function getModerator(uint id)
-			 external view returns (address)
-		{
-			 if( id < _moderators_list.length ) 
-				   return _moderators_list[id];
-			  else return address(0);
-		}
-  
-		function getModeratorsCount()
-			 external view returns (uint)
-		{
-			 return _moderators_list.length;
-		}
-  
- 
-  
-		 function add(uint256 permalink, uint64 version, string memory ipfsHash)
-			 external whenNotPaused onlyModerator
-		 { 
-
-			  uint256 index = versions[permalink];
-			  require(records[index].isRevoked == false, "LIST02: permalink is already revoked"); 
-			  require((version - records[index].version) == 1, "LIST03: version increment must be 1"); 
-
-			  records.push();
-			  uint256 counter = records.length - 1;
-			  records[counter].permalink = permalink ;
-			  records[counter].version = version ;
-			  records[counter].ipfsHash = ipfsHash ;
-		  
-			  versions[permalink] = counter; 
-
-			  emit Version(permalink, version, ipfsHash);
+		function initialize() public initializer {
+			 __Ownable_init();
+			 __Pausable_init();
+			 relays.push();
 		 }
-  
-		 function revoke(uint256 permalink, string memory ipfsHash)
-			 external whenNotPaused onlyModerator
-		 { 
-			  records.push();
-			  uint256 counter = records.length - 1;
-			  records[counter].permalink = permalink ;
-			  records[counter].isRevoked = true ;
-			  records[counter].ipfsHash = ipfsHash ;
-		  
-			  versions[permalink] = counter; 
-
-			  emit Revoke(permalink, ipfsHash);
-		 }
-
-  
-		 function getVersion(uint256 permalink)
-			  external view returns (uint64)
+	   
+		 modifier onlyRelay() 
 		 {
-			  return records[versions[permalink]].version;			  
+			 _isRelay();
+			 _;
+		 }
+
+		 function _isRelay() internal view 
+		 {
+			 require((relaysIndex[msg.sender] > 0) , "LIST01: not a relay"); 
+		 }  
+   
+		 function getContractVersion() public pure
+			 returns (uint64)
+		 {
+				 return 300; // 300 = version 3.00
+		 }
+   
+		 function addRelay(address to)
+			  external onlyOwner
+		 {
+			  require((relaysIndex[to] == 0) , "LIST02: relay already added"); 
+			  relays.push();
+			  relaysCount++;
+			  uint128 relayId = relaysCount;
+			  relays[relayId].relayAddress = to;
+			  relays[relayId].timestamp = block.timestamp;
+			  relaysIndex[to] = relayId;
+			  
+			  emit RelayAdded(to, relayId);
+			  emit Roothash( 0, relays[relayId].timestamp, relayId);
+		 }
+   
+  
+		 function add(  uint256 permalink, 
+		 				uint128 version,
+		 				uint256 oldRoot,
+		 				uint256 newRoot)
+			 external whenNotPaused onlyRelay
+		 { 
+			 // TODO: add ZK verification of newRoot
+			  uint128 relayId = relaysIndex[msg.sender];
+			  require(oldRoot == relays[relayId].roothash, "LIST03 wrong roothash");
+			  require(versions[permalink].relayId == 0, "LIST04 already added");
+			  
+			  relays[relayId].timestamp = block.timestamp;
+			  relays[relayId].roothash = newRoot;
+			  relays[relayId].counter++;
+			  emit Roothash( newRoot, relays[relayId].timestamp, relayId);
+			  
+			  versions[permalink].version = version;
+			  versions[permalink].relayId = relayId;
+			  emit Version(permalink, version, relayId); 
+		 }
+		 
+		 function update(	uint256 permalink, 
+		 					uint128 version,
+		 					uint256 oldRoot,
+		 					uint256 newRoot)
+			 external whenNotPaused onlyRelay
+		 { 
+			 // TODO: add ZK verification of newRoot
+			  uint128 relayId = relaysIndex[msg.sender];
+			  require(oldRoot == relays[relayId].roothash, "LIST05 wrong roothash");
+			  require(versions[permalink].relayId == relayId, "LIST06 wrong relay");
+			  require((version - versions[permalink].version) == 1, "LIST07 wrong version increment");
+			  
+			  relays[relayId].timestamp = block.timestamp;
+			  relays[relayId].roothash = newRoot;
+			  relays[relayId].counter++;
+			  emit Roothash( newRoot, relays[relayId].timestamp, relayId);
+			  
+			  versions[permalink].version = version;
+			  emit Version(permalink, version, relayId); 
+		 }
+		 
+		 function revoke(	uint256 permalink, 
+		 					uint256 oldRoot,
+		 					uint256 newRoot)
+			 external whenNotPaused onlyRelay
+		 { 
+			 // TODO: add ZK verification of newRoot
+			  uint128 relayId = relaysIndex[msg.sender];
+			  require(oldRoot == relays[relayId].roothash, "LIST08 wrong roothash");
+			  require(versions[permalink].relayId == relayId, "LIST09 wrong relay");
+			  
+			  relays[relayId].timestamp = block.timestamp;
+			  relays[relayId].roothash = newRoot;
+			  relays[relayId].counter++;
+			  emit Roothash( newRoot, relays[relayId].timestamp, relayId);
+			  
+			  versions[permalink].version = 1;
+			  emit Version(permalink, 1, relayId); 
+		 }
+
+		 function allowTransfer(uint256 permalink, uint256 roothash)
+			 external whenNotPaused onlyRelay
+		 { 
+			  uint128 relayId = relaysIndex[msg.sender];
+			  require(roothash == relays[relayId].roothash, "LIST10 wrong roothash");
+			  require(versions[permalink].relayId == relayId, "LIST11 wrong relay");
+			  allowedTransfers[relayId][permalink] = roothash;	
+		 }
+
+
+		 function transfer(uint256 permalink, 
+		 					uint128 newRelayId, 
+		 					uint256 oldRelayOldRoot,
+		 					uint256 oldRelayNewRoot,
+		 					uint256 newRelayOldRoot,
+		 					uint256 newRelayNewRoot)
+			 external whenNotPaused onlyRelay
+		 { 
+			  uint128 relayId = relaysIndex[msg.sender];
+			  require(relayId != newRelayId, "LIST12 cannot transfer to myself");
+			  require(newRelayId <= relaysCount, "LIST13 not a relay");
+			  require(oldRelayOldRoot == relays[relayId].roothash, "LIST14 wrong roothash");
+			  require(newRelayOldRoot == relays[newRelayId].roothash, "LIST15 wrong roothash");
+			  require(versions[permalink].relayId == relayId, "LIST16 wrong relay");
+			  require(allowedTransfers[newRelayId][permalink] == relays[newRelayId].roothash, "LIST17 wrong roothash");
+
+			  relays[newRelayId].timestamp = block.timestamp;
+			  relays[newRelayId].roothash = newRelayNewRoot;
+			  relays[newRelayId].counter++;
+			  emit Roothash( newRelayNewRoot, relays[newRelayId].timestamp, newRelayId);
+  
+			  relays[relayId].timestamp = block.timestamp;
+			  relays[relayId].roothash = oldRelayNewRoot;
+			  relays[relayId].counter++;
+			  emit Roothash( oldRelayNewRoot, relays[relayId].timestamp, relayId);
+
+			  versions[permalink].relayId = newRelayId;
+			  emit Version(permalink, versions[permalink].version, newRelayId);  	
+		 }
+
+		 // Confirm that roothash is not changed
+		 function ping(uint256 roothash)
+			 external whenNotPaused onlyRelay
+		 { 
+			  uint128 relayId = relaysIndex[msg.sender];
+			  require(roothash == relays[relayId].roothash, "LIST18 wrong roothash");
+			  relays[relayId].timestamp = block.timestamp;
+			  emit Roothash( roothash, relays[relayId].timestamp, relayId);
+		 }
+
+		 function getVersion(uint256 permalink)
+			  external view returns (uint128)
+		 {
+			  return versions[permalink].version;			  
+		 }
+		 
+		 function getRelay(uint256 permalink)
+			  external view returns (uint128)
+		 {
+			  return versions[permalink].relayId;			  
 		 }
 		 
 		 function isRevoked(uint256 permalink)
 			  external view returns (bool)
 		 {
-			  return records[versions[permalink]].isRevoked;			  
+			  return versions[permalink].version == 1;			  
 		 }
 
-		   
-		 function getHash( uint256 permalink)
-			  external view returns (string memory)
-		 {
-			return records[versions[permalink]].ipfsHash;			  
-		 }
-
-
-		 function getRecordsCount()
-			  external view returns (uint256)
-		 {
-			  return records.length;
-		 }
 	
-
 		 function pause()
 			  external whenNotPaused onlyOwner
 		 {
@@ -183,17 +221,4 @@ contract List is Initializable,
 		  {
 			  _unpause(); 
 		  }
-		 
-		 function sync(	 uint256 _roothash, uint256 _syncCounter )
-			  external whenNotPaused onlyOwner
-		 {
-		 	  require(_syncCounter > syncCounter, "LIST04: syncCounter is low"); 
-			  roothash = _roothash;
-			  syncCounter = _syncCounter ; //
-			  uint timestamp = block.timestamp;
-			  emit MessageSent(abi.encode(roothash, syncCounter, timestamp));
-			  emit Sync(roothash, syncCounter, timestamp );			 
-		 }
-		 
-  
 }
