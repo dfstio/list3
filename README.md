@@ -13,7 +13,9 @@ Run yarn from list directory
 In case you plan to change circuit, install circom using 
 https://docs.circom.io/getting-started/installation/
 
-Faucet: https://goerlifaucet.com/
+Faucets: 
+https://goerlifaucet.com/
+https://mumbaifaucet.com/
 
 ## Contracts
 
@@ -43,6 +45,8 @@ https://rinkeby.etherscan.io/address/0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb
 	List contract: add( address, version, hash )
 	New record is being added for address changing to new version with additional information 
 	written to string hash (that can be IPFS hash or proof)
+
+When sharing the object, identity should share object permalink, relayId responsible for sealing on blockchain with List contract and object version
 
 ## Command line tools
 
