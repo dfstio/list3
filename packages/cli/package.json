@@ -8,6 +8,7 @@
     "sync": "node sync.js",
     "verify": "node verify.js",
     "listhash": "node listhash.js",
+    "cli": "node cli.js",
     "archive": "git archive -o cli.zip HEAD"
   },
   "dependencies": {
@@ -17,8 +18,14 @@
     "@maticnetwork/maticjs-ethers": "^1.0.2",
     "@maticnetwork/maticjs-web3": "^1.0.1",
     "circomlibjs": "^0.1.2",
+    "commander": "^9.2.0",
     "eth-revert-reason": "^1.0.3",
     "ethers": "^5.5.1",
-    "fs": "^0.0.1-security"
+    "fs": "^0.0.1-security",
+    "snarkjs": "^0.4.18",
+    "util": "^0.12.4"
+  },
+  "bin": {
+    "cli": "./cli.js"
   }
 }

@@ -25,6 +25,7 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 			   uint256 roothash; 	// roothash of the SMT
 			   uint256 counter; 	// number of updates in SMT
 			   uint256 timestamp; 	// timestamp of roothash update
+			   bool isActive; 		// if false operations of relay are suspended except for transfers from relay
 			   string ipfsHash; 	// IPFS hash of JSON configuration file describing relay API access
 		}	
 	 
@@ -33,15 +34,19 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 		mapping(address => uint128) public relaysIndex; // relayAddress => index in relays[]
 	   
 		// allowed transfers between relays
-		// relayId => permalink => roothash
+		// old relayId  => permalink => old relay's roothash
 		mapping (uint128 => mapping(uint256 => uint256)) public allowedTransfers; 
 
 		// Events
-		event Version(uint256 indexed permalink, uint128 indexed version, uint128 indexed relayId); // new version recorded
-		event Roothash(uint256 indexed roothash, uint256 timestamp, uint128 indexed relayId); // Relay's roothash changed
-		event RelayAdded(address indexed relayAddress, uint128 indexed relayId); // Added new relay
+		event Version(uint256 indexed permalink, uint128 version, uint128 indexed relayId, uint256 indexed roothash); // new version recorded
+		event Roothash(uint256 indexed roothash, uint128 indexed relayId); // Relay's roothash changed
 		event Transfer(uint256 indexed permalink, uint128 indexed fromRelayId, uint128 indexed toRelayId);
+
+		event RelayAdded(address indexed relayAddress, uint128 indexed relayId); // Added new relay
 		event RelayConfig(uint128 indexed relayId, string ipfsHash); 
+		event ShutdownRelay(uint128 indexed relayId);
+
+
 
 		function initialize() public initializer {
 			 __Ownable_init();
@@ -67,18 +72,29 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 		 }
    
 		 function addRelay(address to)
-			  external onlyOwner
+			  external whenNotPaused onlyOwner
 		 {
 			  require((relaysIndex[to] == 0) , "LIST02: relay already added"); 
 			  relays.push();
 			  relaysCount++;
 			  uint128 relayId = relaysCount;
 			  relays[relayId].relayAddress = to;
+			  relays[relayId].isActive = true;
 			  relays[relayId].timestamp = block.timestamp;
 			  relaysIndex[to] = relayId;
 			  
 			  emit RelayAdded(to, relayId);
-			  emit Roothash( 0, relays[relayId].timestamp, relayId);
+			  emit Roothash( 0, relayId);
+		 }
+		 
+		 function shutdownRelay(address to)
+			  external onlyOwner
+		 {
+			  uint128 relayId = relaysIndex[to];
+			  require( relayId > 0, "LIST02a: not a relay"); 
+			  relays[relayId].isActive = false;
+			  
+			  emit ShutdownRelay(relayId);
 		 }
   
   		 function setRelayConfig(string memory ipfsHash)
@@ -104,11 +120,10 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 			  relays[relayId].timestamp = block.timestamp;
 			  relays[relayId].roothash = newRoot;
 			  relays[relayId].counter++;
-			  emit Roothash( newRoot, relays[relayId].timestamp, relayId);
 			  
 			  versions[permalink].version = version;
 			  versions[permalink].relayId = relayId;
-			  emit Version(permalink, version, relayId); 
+			  emit Version(permalink, version, relayId, newRoot); 
 		 }
 		 
 		 
@@ -127,10 +142,9 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 			  relays[relayId].timestamp = block.timestamp;
 			  relays[relayId].roothash = newRoot;
 			  relays[relayId].counter++;
-			  emit Roothash( newRoot, relays[relayId].timestamp, relayId);
 			  
 			  versions[permalink].version = version;
-			  emit Version(permalink, version, relayId); 
+			  emit Version(permalink, version, relayId, newRoot); 
 		 }
 		 
 		 function revoke(	uint256 permalink, 
@@ -145,13 +159,13 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 			  
 			  relays[relayId].timestamp = block.timestamp;
 			  relays[relayId].roothash = newRoot;
-			  relays[relayId].counter++;
-			  emit Roothash( newRoot, relays[relayId].timestamp, relayId);
-			  
+			  relays[relayId].counter++;			  
 			  versions[permalink].version = 1;
-			  emit Version(permalink, 1, relayId); 
+			  
+			  emit Version(permalink, 1, relayId, newRoot); 
 		 }
 
+		 // Allow transfer from relay
 		 function allowTransfer(uint256 permalink, uint256 roothash)
 			 external whenNotPaused onlyRelay
 		 { 
@@ -161,36 +175,47 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 			  allowedTransfers[relayId][permalink] = roothash;	
 		 }
 
+		 // Allow transfer from suspended relay
+		 function allowForcedTransfer(uint256 permalink, uint128 relayId, uint256 roothash)
+			 external whenNotPaused onlyOwner
+		 { 
+			  require(relayId <= relaysCount, "LIST10 wrong relayId");
+			  require(roothash == relays[relayId].roothash, "LIST10a wrong roothash");
+			  require(relays[relayId].isActive == false, "LIST10b please shutdown relay first");
+			  require(versions[permalink].relayId == relayId, "LIST11 wrong relay");
+			  allowedTransfers[relayId][permalink] = roothash;	
+		 }
 
 		 function transfer(uint256 permalink, 
-		 					uint128 newRelayId, 
+		 					uint128 oldRelayId,	 
 		 					uint256 oldRelayOldRoot,
 		 					uint256 oldRelayNewRoot,
 		 					uint256 newRelayOldRoot,
 		 					uint256 newRelayNewRoot)
 			 external whenNotPaused onlyRelay
 		 { 
-			  uint128 relayId = relaysIndex[msg.sender];
-			  require(relayId != newRelayId, "LIST12 cannot transfer to myself");
+			  uint128 newRelayId = relaysIndex[msg.sender];
+			  require(oldRelayId != newRelayId, "LIST12 cannot transfer to myself");
 			  require(newRelayId <= relaysCount, "LIST13 not a relay");
-			  require(oldRelayOldRoot == relays[relayId].roothash, "LIST14 wrong roothash");
+			  require(oldRelayOldRoot == relays[oldRelayId].roothash, "LIST14 wrong roothash");
 			  require(newRelayOldRoot == relays[newRelayId].roothash, "LIST15 wrong roothash");
-			  require(versions[permalink].relayId == relayId, "LIST16 wrong relay");
+			  require(versions[permalink].relayId == oldRelayId, "LIST16 wrong relay");
 			  require(allowedTransfers[newRelayId][permalink] == relays[newRelayId].roothash, "LIST17 wrong roothash");
 
 			  relays[newRelayId].timestamp = block.timestamp;
 			  relays[newRelayId].roothash = newRelayNewRoot;
 			  relays[newRelayId].counter++;
-			  emit Roothash( newRelayNewRoot, relays[newRelayId].timestamp, newRelayId);
+			  
   
-			  relays[relayId].timestamp = block.timestamp;
-			  relays[relayId].roothash = oldRelayNewRoot;
-			  relays[relayId].counter++;
-			  emit Roothash( oldRelayNewRoot, relays[relayId].timestamp, relayId);
+			  relays[oldRelayId].timestamp = block.timestamp;
+			  relays[oldRelayId].roothash = oldRelayNewRoot;
+			  relays[oldRelayId].counter++;
+			  
 
 			  versions[permalink].relayId = newRelayId;
-			  emit Version(permalink, versions[permalink].version, newRelayId);  
-			  emit Transfer(permalink, relayId, newRelayId); // relays should ping after the transfer to confirm the state	
+			  emit Version(permalink, versions[permalink].version, newRelayId, newRelayNewRoot);  
+			  emit Roothash( oldRelayNewRoot, oldRelayId);
+			  emit Transfer(permalink, oldRelayId, newRelayId); // relays should ping after the transfer to confirm the state	
 		 }
 
 		 // Confirm that roothash is not changed
@@ -200,7 +225,7 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 			  uint128 relayId = relaysIndex[msg.sender];
 			  require(roothash == relays[relayId].roothash, "LIST18 wrong roothash");
 			  relays[relayId].timestamp = block.timestamp;
-			  emit Roothash( roothash, relays[relayId].timestamp, relayId);
+			  emit Roothash( roothash, relayId);
 		 }
 
 		 function getVersion(uint256 permalink)
@@ -220,8 +245,13 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 		 {
 			  return versions[permalink].version == 1;			  
 		 }
-
 	
+		 function isVersionUnchanged(uint256 permalink, uint128 version)
+			  external view returns (bool)
+		 {
+			  return versions[permalink].version == version;			  
+		 }	 
+		 
 		 function pause()
 			  external whenNotPaused onlyOwner
 		 {

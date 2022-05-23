@@ -27,6 +27,7 @@ v2:  0xbDEBAb0a14CDa02c196bDC2C2490D96d3DfC6a61
 https://mumbai.polygonscan.com/address/0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb
 
 List contract v 2 is deployed to mumbai network at address 0x572aC98bDea8950f348d2C66945d4E5312B35bbe  
+https://mumbai.polygonscan.com/address/0x572aC98bDea8950f348d2C66945d4E5312B35bbe
 Implementation contracts are deployed to:  
 v1:  0xd58bf69dabcaefe8d1ead6327190ff215f5b0c3f
 
@@ -75,3 +76,18 @@ yarn add <address> <IPFShash>
 - Scripts on monorepo level
 - Goals
 - Previous root in Verifier 
+
+## FAQ
+If list command is not working, run in the packages/cli folder:
+	
+	chmod +x cli.js
+	
+and in the list folder
+
+	npm link
+	
+Then try to run list command from the list folder
+
+	list help
+	
+	

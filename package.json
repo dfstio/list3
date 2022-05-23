@@ -15,8 +15,12 @@
    "scripts": {    
 	  "start": "yarn ",    
 	  "build": "yarn ",
-	  "sync": "yarn workspace @list/cli sync",
+	  "cli": "yarn workspace @list/cli cli",
 	  "push": "git push -u origin master",
-	  "commit": "git commit -a -S -m"  
-   }
+	  "commit": "git commit -a -S -m",
+	  "link": "npm link"  
+   },
+   "bin" : {
+    "list" : "./packages/cli/cli.js"
+  }
 }
