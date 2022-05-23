@@ -29,7 +29,7 @@ async function add(permalink, version, relayId)
 	 {
 	 	const _key = events[i].args.permalink;
 	 	const _value = events[i].args.version
-	 	console.log("Record", i, _key.toString(), _value.toString());
+	 	console.log("Record", i, ":", _key.toString(), _value.toString());
 	 	const key = tree.F.e(_key);
 	 	const value = tree.F.e(_value);
 	 	const res = await tree.find(key);

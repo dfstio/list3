@@ -16,7 +16,8 @@
 	  "start": "yarn ",    
 	  "build": "yarn ",
 	  "cli": "yarn workspace @list/cli cli",
-	  "push": "git push -u origin master",
+	  "push": "git push -u originlist3 master",
+	  "gitcreate": "git remote add originlist3 https://github.com/Benjamin-Herald/list3",
 	  "commit": "git commit -a -S -m",
 	  "link": "npm link"  
    },
