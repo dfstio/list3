@@ -1,5 +1,5 @@
 
-const {RPC_MUMBAI, RELAY, LIST_CONTRACT_ADDRESS } = require('@list/config');
+const {RPC_MUMBAI, RELAY, LIST_CONTRACT_ADDRESS, PROOF_DIR } = require('@list/config');
 const ListJSON = require("@list/contracts/abi/contracts/list.sol/List.json");
 const vKeyAdd = require("../circuit/verification_keyadd.json");
 const ethers = require("ethers");
@@ -89,21 +89,30 @@ async function generateAddInput(tree, _key, _value)
     
     console.log("Input: ");
     console.log( JSON.stringify(input, (_, v) => typeof v === 'bigint' ? v.toString() : v, 1));
-    await fs.writeFile("./data/add-input.json", JSON.stringify(input, (_, v) => typeof v === 'bigint' ? v.toString() : v), function (err) {
-		   if (err) return console.log(err);
-		 });
+    await save(input, "input")
 	return input;
 }
 
+async function save(data, name) 
+{
+	const filename = PROOF_DIR + name + ".json"; 
+    await fs.writeFile(filename, JSON.stringify(data, (_, v) => typeof v === 'bigint' ? v.toString() : v), function (err) {
+		   if (err) return console.log(err);
+		 });
+
+};
 async function snark(input, wasm, zkey, vkey) 
 {
     const { proof, publicSignals } = await snarkjs.groth16.fullProve(input, wasm, zkey);
 
     console.log("Proof: ");
     console.log(JSON.stringify(proof, null, 1));
+    await save(proof, "proof");
     
     console.log("publicSignals: ");
     console.log(JSON.stringify(publicSignals, null, 1));
+    await save(publicSignals, "public");
+    await save(vkey, "verification_key");
     
     const result = await snarkjs.groth16.verify(vkey, publicSignals, proof);
 

@@ -1,4 +1,5 @@
 #! /usr/bin/env node
+const { PROOF_DIR } = require('@list/config');
 const { Command } = require('commander');
 const program = new Command();
 const { add, update, revoke } = require("./list");
@@ -29,6 +30,7 @@ program.command('update')
   .action(async (permalink, version, options) => {
   	const relayId = options.Relay? options.Relay : 1 ;
     console.log('updating key', permalink, 'to version' , version, 'on SMT relay', relayId);
+    console.log("Not implemented yet");
   });  
 
 program.command('revoke')
@@ -38,6 +40,7 @@ program.command('revoke')
   .action(async (permalink, options) => {
   	const relayId = options.Relay? options.Relay : 1 ;
     console.log('revoking key', permalink, 'on SMT relay', relayId);
+    console.log("Not implemented yet");
   });  
 
 program.command('verify')
@@ -46,14 +49,14 @@ program.command('verify')
     console.log('Verifying proof...');
     let out = 'snarkjs cli call failed';
 	try {
-      	out = await exec(`snarkjs g16v ./packages/circuit/verification_keyadd.json ./packages/circuit/public.json ./packages/circuit/proof.json`);
+      	out = await exec(`snarkjs g16v ${PROOF_DIR}verification_key.json ${PROOF_DIR}public.json ${PROOF_DIR}proof.json`);
       	console.log("Result of snarkjs verify cli call: ", out.stdout.toString());
     } catch (e) {
       console.log(out, e)
       throw e
     }
   }); 
-
+  
 
 async function main()
 {
