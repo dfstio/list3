@@ -50,47 +50,47 @@ VerifierPermalink contract is deployed to mumbai network at address 0xb6514E22ef
 https://mumbai.polygonscan.com/address/0xb6514E22ef505d8bD1AF6A39cB0FB578c9241515  
 
 ## Usage:
-Usage: list [options] [command]
+	Usage (from list3 folder): list [options] [command]
 
-CLI for list and zero knowledge proofs of inclusion and exclusion 
+	CLI for list and zero knowledge proofs of inclusion and exclusion 
 
-Options:  
-  -V, --version                           output the version number  
-  -h, --help                              display help for command  
+	Options:  
+	  -V, --version                           output the version number  
+	  -h, --help                              display help for command  
 
-Commands:  
-  add [options] <name> <version>          Add to SMT key-value pair: key is permalink of claim, value is version  
-  update [options] <permalink> <version>  Update value of SMT key: key is permalink, value is version  
-  revoke [options] <permalink>            Revoke SMT key: key is permalink  
-  claim <name>                            Generate new claim  
-  ethereum                                Verify Version and Roothash Mumbai events on Ethereum Goerli  
-  verify                                  Verify proof  
-  help [command]                          display help for command  
+	Commands:  
+	  add [options] <name> <version>          Add to SMT key-value pair: key is permalink of claim, value is version  
+	  update [options] <permalink> <version>  Update value of SMT key: key is permalink, value is version  
+	  revoke [options] <permalink>            Revoke SMT key: key is permalink  
+	  claim <name>                            Generate new claim  
+	  ethereum                                Verify Version and Roothash Mumbai events on Ethereum Goerli  
+	  verify                                  Verify proof  
+	  help [command]                          display help for command  
 
 
 ### add
-Usage: list add [options] <name> <version>  
+	Usage: list add [options] <name> <version>  
 
-Add to SMT key-value pair: key is permalink of claim, value is version  
+	Add to SMT key-value pair: key is permalink of claim, value is version  
 
-Arguments:  
-  name             claim name  
-  version          claim version, must be 2 or bigger  
+	Arguments:  
+	  name             claim name  
+	  version          claim version, must be 2 or bigger  
 
-Options:  
-  -relay <number>  relayId to use  
-  -h, --help       display help for command  
+	Options:  
+	  -relay <number>  relayId to use  
+	  -h, --help       display help for command  
   
 ### claim
-Usage: list claim [options] <name>  
+	Usage: list claim [options] <name>  
 
-Generate new claim  
+	Generate new claim  
 
-Arguments:  
-  name        claim name  
+	Arguments:  
+	  name        claim name  
 
-Options:  
-  -h, --help  display help for command
+	Options:  
+	  -h, --help  display help for command
   
 
 ## TODO
