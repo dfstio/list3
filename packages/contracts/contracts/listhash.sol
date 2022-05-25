@@ -34,7 +34,7 @@ contract ListHash {
     using ExitPayloadReader for ExitPayloadReader.Receipt;
 
     // keccak256(MessageSent(bytes))
-    bytes32 public constant SEND_MESSAGE_EVENT_SIG = 0x8c5261668696ce22758910d05bab8f186d6eb247ceac2af2e82c7dc17669b036;
+    bytes32 public constant VERSION_EVENT_SIG = 0x40779ce7063d5f55ba195a4101faa644098b5c4e985b7d57f5f326e4f6e2af84;
 
 
     // root chain manager
@@ -44,6 +44,14 @@ contract ListHash {
 
     // storage to avoid duplicate exits
     // mapping(bytes32 => bool) public processedExits;
+    
+    struct Version {
+    	uint256 permalink;
+		uint128 version; 
+		uint128 relayId; 
+		uint256 roothash; 
+		uint256 timestamp;
+    }
 
     constructor(address _checkpointManager,address _fxChildTunnel) {
         checkpointManager = ICheckpointManager(_checkpointManager);
@@ -51,11 +59,14 @@ contract ListHash {
     }
 
 
-    function _validateAndExtractMessage(bytes memory inputData) internal view returns (bytes memory) {
+    function getVersion(bytes memory inputData) 
+    		public view returns ( Version memory version ) {
         ExitPayloadReader.ExitPayload memory payload = inputData.toExitPayload();
 
         bytes memory branchMaskBytes = payload.getBranchMaskAsBytes();
         uint256 blockNumber = payload.getBlockNumber();
+        
+
         
         
         /* checking if exit has already been processed
@@ -76,6 +87,7 @@ contract ListHash {
 		
         ExitPayloadReader.Receipt memory receipt = payload.getReceipt();
         ExitPayloadReader.Log memory log = receipt.getLog();
+
 
         // check child tunnel
         require(fxChildTunnel == log.getEmitter(), "FxRootTunnel: INVALID_FX_CHILD_TUNNEL");
@@ -100,13 +112,18 @@ contract ListHash {
         ExitPayloadReader.LogTopics memory topics = log.getTopics();
 
         require(
-            bytes32(topics.getField(0).toUint()) == SEND_MESSAGE_EVENT_SIG, // topic0 is event sig
+            bytes32(topics.getField(0).toUint()) == VERSION_EVENT_SIG, // topic0 is event sig
             "FxRootTunnel: INVALID_SIGNATURE"
         );
+        
+		Version memory result; 
+        result.permalink = topics.getField(1).toUint();   
+        result.relayId = uint128(topics.getField(2).toUint());
+        result.roothash = topics.getField(3).toUint();
+        result.version = abi.decode(log.getData(), (uint128));
+        result.timestamp = payload.getBlockTime();
 
-        // received message data
-        bytes memory message = abi.decode(log.getData(), (bytes)); // event decodes params again, so decoding bytes to get message
-        return message;
+        return result;
     }
 
     function _checkBlockMembershipInCheckpoint(
@@ -146,15 +163,5 @@ contract ListHash {
      *  8 - branchMask - 32 bits denoting the path of receipt in merkle tree
      *  9 - receiptLogIndex - Log Index to read from the receipt
      */
-    function receiveMessage(bytes memory inputData) public view returns (bytes memory) 
-    {
-        bytes memory message = _validateAndExtractMessage(inputData);
-        return message;
-    }
-
-    function parseMessage(bytes memory inputData) public view returns (uint256 roothash, uint256 syncCounter, uint timestamp) 
-    {
-        return abi.decode( receiveMessage(inputData), (uint256, uint256, uint));
-    }
 
 }

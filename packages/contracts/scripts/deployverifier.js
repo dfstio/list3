@@ -17,8 +17,8 @@ async function main() {
   const owner = accounts[0].address;
   console.log("Deployer address:", owner);
   // We get the contract to deploy
-  const Verifier = await hre.ethers.getContractFactory("Verifier");
-  const verifier = await Verifier.deploy(owner);
+  const Verifier = await hre.ethers.getContractFactory("VerifierAdd");
+  const verifier = await Verifier.deploy();
 
   await verifier.deployed();
 

@@ -41,7 +41,7 @@ async function main()
 	  }
     });
     
-    const events = await list.queryFilter('MessageSent');
+    const events = await list.queryFilter('Version');
     console.log("Found ", events.length, " events");
     
     let i = events.length - 1;
@@ -52,10 +52,11 @@ async function main()
 		 console.log("Event ", i, " isCheckPointed: ", isReady);
 		 if( isReady )
 		 {
-			 const proof = await posClient.exitUtil.buildPayloadForExit(txHash, "0x8c5261668696ce22758910d05bab8f186d6eb247ceac2af2e82c7dc17669b036")
+			 const proof = await posClient.exitUtil.buildPayloadForExit(txHash, "0x40779ce7063d5f55ba195a4101faa644098b5c4e985b7d57f5f326e4f6e2af84")
 			 console.log("proof: ", proof);    
-			 const result = await listhash.parseMessage(proof);
-			 console.log("Result: ", result);
+			 const result = await listhash.getVersion(proof);
+			 console.log("Result: ");
+			 console.log(JSON.stringify(result, (_, v) => typeof v === 'bigint' ? v.toString() : v, 1));
 			 return;
 		 } else i--; 
 	};

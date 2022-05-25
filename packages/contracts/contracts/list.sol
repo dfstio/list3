@@ -8,6 +8,16 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
 
+interface IVerifierAdd {
+
+    function verifyProof(
+            uint[2] memory a,
+            uint[2][2] memory b,
+            uint[2] memory c,
+            uint[4] memory input
+        ) external view returns (bool r);
+} 
+        
 contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 {
 		// Version of the permalink object served by relay
@@ -46,11 +56,12 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 		event RelayConfig(uint128 indexed relayId, string ipfsHash); 
 		event ShutdownRelay(uint128 indexed relayId);
 
+		IVerifierAdd verifierAdd;
 
-
-		function initialize() public initializer {
+		function initialize(IVerifierAdd _verifierAdd) public initializer {
 			 __Ownable_init();
 			 __Pausable_init();
+			 verifierAdd = _verifierAdd;
 			 relays.push();
 		 }
 	   
@@ -106,14 +117,18 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 		 }
  
   
-		 function add(  uint256 permalink, 
-		 				uint128 version,
-		 				uint256 oldRoot,
-		 				uint256 newRoot)
+		 function add( uint[2] memory a,
+					   uint[2][2] memory b,
+					   uint[2] memory c,
+					   uint[4] memory input) 
 			 external whenNotPaused onlyRelay
 		 { 
-			 // TODO: add ZK verification of newRoot
+              require( verifierAdd.verifyProof(a, b, c, input) == true, "LIST03a wrong proof");
 			  uint128 relayId = relaysIndex[msg.sender];
+			  uint256 newRoot 	= input[0];
+			  uint256 oldRoot 	= input[1];
+			  uint256 permalink = input[2];
+			  uint128 version 	= uint128(input[3]);
 			  require(oldRoot == relays[relayId].roothash, "LIST03 wrong roothash");
 			  require(versions[permalink].relayId == 0, "LIST04 already added");
 			  

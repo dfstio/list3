@@ -32,14 +32,20 @@ Implementation contracts are deployed to:
 v1:  0xd58bf69dabcaefe8d1ead6327190ff215f5b0c3f
 
 
-https://mumbai.polygonscan.com/address/0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb
+List contract v 3 is deployed to mumbai network at address 0x3990747e22AFA4f3Ff8F84c99209B562b40b509c  
+https://mumbai.polygonscan.com/address/0x3990747e22AFA4f3Ff8F84c99209B562b40b509c
+Implementation contracts are deployed to:  
+v1:  0xbaa0d0df5046081aa6d80fa77e6113be1cc7be11
 
 
-ListHash deployed to Goerli: 0x355Bd8a9898751b779Bf621650d70eEa93FD65eC
-https://goerli.etherscan.io/address/0x355bd8a9898751b779bf621650d70eea93fd65ec#code
+ListHash deployed to Goerli: 0x3C383Cb6067B95d709302435CFF1e017Ba795705
+https://goerli.etherscan.io/address/0x3C383Cb6067B95d709302435CFF1e017Ba795705
 
 Verifier contract is deployed to rinkeby network at address 0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb
 https://rinkeby.etherscan.io/address/0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb
+
+VerifierAdd contract is deployed to mumbai network at address 0x613c90582B1668cA6BD31A42803c9e37596a836B
+https://mumbai.polygonscan.com/address/0x613c90582B1668cA6BD31A42803c9e37596a836B
 
 ### Usage:
 

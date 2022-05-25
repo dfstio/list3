@@ -27,14 +27,17 @@ async function add(permalink, version, relayId)
 	 var i;
 	 for( i = 0; i < count; i++)
 	 {
-	 	const _key = events[i].args.permalink;
-	 	const _value = events[i].args.version
-	 	console.log("Record", i, ":", _key.toString(), _value.toString());
-	 	const key = tree.F.e(_key);
-	 	const value = tree.F.e(_value);
-	 	const res = await tree.find(key);
-	 	if( res.found ) await tree.update(key, value);
-	 	else await tree.insert(key, value);
+	 	if( events[i].args.relayId == relayId )
+	 	{
+			const _key = events[i].args.permalink;
+			const _value = events[i].args.version
+			console.log("Record", i, ":", _key.toString(), _value.toString());
+			const key = tree.F.e(_key);
+			const value = tree.F.e(_value);
+			const res = await tree.find(key);
+			if( res.found ) await tree.update(key, value);
+			else await tree.insert(key, value);
+	 	}
 	 }
 	 
 
@@ -50,6 +53,23 @@ async function add(permalink, version, relayId)
 	 {
 	 	console.log("New root", tree.F.toObject(tree.root).toString());
 	 	console.log("Adding keypair to blockchain...");
+	 	const tx = await list.add(
+	 		[proof.pi_a[0], proof.pi_a[1]],
+	 		[[proof.pi_b[0][1],proof.pi_b[0][0]],[proof.pi_b[1][1],proof.pi_b[1][0]]],
+	 		[proof.pi_c[0],proof.pi_c[1]],
+	 		publicSignals
+	 	);
+	 
+		console.log("TX sent: ", tx.hash);
+		const receipt = await tx.wait(1);
+		console.log('Transaction receipt', receipt);
+		
+		const relayData = await list.relays(relayId);
+		const newRoot = relayData.roothash;
+		if( newRoot.toString() == tree.F.toObject(tree.root).toString()) 
+			console.log('New roothash on blockchain is correct: ', newRoot.toString());
+		else
+			console.error('New roothash on blockchain is WRONG:', newRoot.toString());
 	 }
 };
 
@@ -74,10 +94,9 @@ async function generateAddInput(tree, _key, _value)
     const res = await tree.insert(key,value);
     let siblings = res.siblings;
     for (let i=0; i<siblings.length; i++) siblings[i] = tree.F.toObject(siblings[i]);
-    while (siblings.length<10) siblings.push(0);
+    while (siblings.length<16) siblings.push(0);
 
     const input = {
-        fnc: [1,0],
         oldRoot: tree.F.toObject(res.oldRoot),
         siblings: siblings,
         oldKey: res.isOld0 ? 0 : tree.F.toObject(res.oldKey),
