@@ -187,7 +187,7 @@ Options:
 
 ## TODO
 - transfer
-- ZK proof of exclusion for Ethereum
+- Transaction on mumbai proving exclusion
 - extend scope to roothashes of identity
 
 
