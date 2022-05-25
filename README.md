@@ -82,66 +82,65 @@ Claim version is added to blockchain checking 2 ZK proofs:
 1) That permalink is owned by claim (executing ZK circuit calculating peterson hash)
 2) That new leaf is correctly inserted into tree
 
+	  Usage: list add [options] <name> <version>  
 
-	Usage: list add [options] <name> <version>  
+	  Add to SMT key-value pair: key is permalink of claim, value is version  
 
-	Add to SMT key-value pair: key is permalink of claim, value is version  
+	  Arguments:  
+		name             claim name  
+		version          claim version, must be 2 or bigger  
 
-	Arguments:  
-	  name             claim name  
-	  version          claim version, must be 2 or bigger  
-
-	Options:  
-	  -relay <number>  relayId to use  
-	  -h, --help       display help for command  
+	  Options:  
+		-relay <number>  relayId to use  
+		-h, --help       display help for command  
 	  
 ### update
 Claim version is updated to blockchain checking 2 ZK proofs:
 1) That permalink is owned by claim (executing ZK circuit calculating peterson hash)
 2) That new leaf is correctly updated on tree
 
-	Usage: list update [options] <name> <version>
+	  Usage: list update [options] <name> <version>
 
-	Update value of SMT key: key is permalink of claim, value is version
+	  Update value of SMT key: key is permalink of claim, value is version
 
-	Arguments:
-	  name             claim name
-	  version          claim version, must be 3 or bigger
+	  Arguments:
+		name             claim name
+		version          claim version, must be 3 or bigger
 
-	Options:
-	  -relay <number>  relayId to use
-	  -h, --help       display help for command
+	  Options:
+		-relay <number>  relayId to use
+		-h, --help       display help for command
 
 ### revoke	  
 Claim version is revoked on blockchain checking 2 ZK proofs:
 1) That permalink is owned by claim (executing ZK circuit calculating peterson hash)
 2) That new leaf is correctly updated on tree (if existed before) or inserted to tree
 
-	Usage: list revoke [options] <name>
+		Usage: list revoke [options] <name>
 
-	Revoke SMT key: key is permalink of claim
+		Revoke SMT key: key is permalink of claim
 
-	Arguments:
-	  name             claim name
+		Arguments:
+		  name             claim name
 
-	Options:
-	  -relay <number>  relayId to use
-	  -h, --help       display help for command
+		Options:
+		  -relay <number>  relayId to use
+		  -h, --help       display help for command
   
 ### claim
 New claim is being created in ./data folder. 
 Private key is being generated and permalink of a claim is 
 peterson hash of private key
 
-	Usage: list claim [options] <name>  
+	  Usage: list claim [options] <name>  
 
-	Generate new claim  
+	  Generate new claim  
 
-	Arguments:  
-	  name        claim name  
+	  Arguments:  
+		name        claim name  
 
-	Options:  
-	  -h, --help  display help for command
+	  Options:  
+		-h, --help  display help for command
   
 
 ## TODO
