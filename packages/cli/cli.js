@@ -4,6 +4,8 @@ const { Command } = require('commander');
 const program = new Command();
 const { add, update, revoke } = require("./list");
 const { claim } = require("./claim");
+const { checkEthereum } = require("./ethereum");
+
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
 
@@ -51,6 +53,14 @@ program.command('claim')
     console.log('Creating claim', name);
 	await claim(name);
   });  
+  
+  
+program.command('ethereum')
+  .description('Verify Version and Roothash Mumbai events on Ethereum Goerli')
+  .action(async () => {
+    console.log('Verifying Version and Roothash Mumbai events on Ethereum Goerli...');
+	await checkEthereum();
+  }); 
   
 program.command('verify')
   .description('Verify proof')

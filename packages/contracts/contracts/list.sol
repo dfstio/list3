@@ -17,6 +17,16 @@ interface IVerifierAdd {
             uint[4] memory input
         ) external view returns (bool r);
 } 
+
+interface IVerifierPermalink {
+
+    function verifyProof(
+            uint[2] memory a,
+            uint[2][2] memory b,
+            uint[2] memory c,
+            uint[1] memory input
+        ) external view returns (bool r);
+} 
         
 contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 {
@@ -57,11 +67,13 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 		event ShutdownRelay(uint128 indexed relayId);
 
 		IVerifierAdd verifierAdd;
+		IVerifierPermalink verifierPermalink;
 
-		function initialize(IVerifierAdd _verifierAdd) public initializer {
+		function initialize(IVerifierAdd _verifierAdd, IVerifierPermalink _verifierPermalink) public initializer {
 			 __Ownable_init();
 			 __Pausable_init();
 			 verifierAdd = _verifierAdd;
+			 verifierPermalink = _verifierPermalink;
 			 relays.push();
 		 }
 	   
@@ -120,14 +132,20 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 		 function add( uint[2] memory a,
 					   uint[2][2] memory b,
 					   uint[2] memory c,
-					   uint[4] memory input) 
+					   uint[4] memory input,
+					   uint[2] memory ap,
+            		   uint[2][2] memory bp,
+                       uint[2] memory cp,
+                       uint[1] memory inputp) 
 			 external whenNotPaused onlyRelay
 		 { 
               require( verifierAdd.verifyProof(a, b, c, input) == true, "LIST03a wrong proof");
+              require( verifierPermalink.verifyProof(ap, bp, cp, inputp) == true, "LIST03b wrong proof");
 			  uint128 relayId = relaysIndex[msg.sender];
 			  uint256 newRoot 	= input[0];
 			  uint256 oldRoot 	= input[1];
 			  uint256 permalink = input[2];
+			  require(permalink == inputp[0], "LIST03c wrong permalink");
 			  uint128 version 	= uint128(input[3]);
 			  require(oldRoot == relays[relayId].roothash, "LIST03 wrong roothash");
 			  require(versions[permalink].relayId == 0, "LIST04 already added");

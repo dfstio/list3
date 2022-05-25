@@ -61,11 +61,16 @@ async function add(name, version, relayId)
 	 	console.log("New root", tree.F.toObject(tree.root).toString());
 	 	console.log("Adding keypair to blockchain...");
 	 	const proof = result.proof;
+	 	const cproof = claim.proof;
 	 	const tx = await list.add(
 	 		[proof.pi_a[0], proof.pi_a[1]],
 	 		[[proof.pi_b[0][1],proof.pi_b[0][0]],[proof.pi_b[1][1],proof.pi_b[1][0]]],
 	 		[proof.pi_c[0],proof.pi_c[1]],
-	 		result.publicSignals
+	 		result.publicSignals,
+	 		[cproof.pi_a[0], cproof.pi_a[1]],
+	 		[[cproof.pi_b[0][1],cproof.pi_b[0][0]],[cproof.pi_b[1][1],cproof.pi_b[1][0]]],
+	 		[cproof.pi_c[0],cproof.pi_c[1]],
+	 		claim.publicSignals
 	 	);
 	 
 		console.log("TX sent: ", tx.hash);

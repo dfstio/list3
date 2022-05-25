@@ -19,27 +19,15 @@ https://mumbaifaucet.com/
 
 ## Contracts
 
-List contract v 1 is deployed to mumbai network at address 0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb  
+List contract is deployed to mumbai network at address 0x059c6E0c38bea3C11f55d46a4E4aaC5d8E80cb82
+https://mumbai.polygonscan.com/address/0x059c6E0c38bea3C11f55d46a4E4aaC5d8E80cb82
 Implementation contracts are deployed to:  
-v1:  0x355bd8a9898751b779bf621650d70eea93fd65ec
-v2:  0xbDEBAb0a14CDa02c196bDC2C2490D96d3DfC6a61
-
-https://mumbai.polygonscan.com/address/0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb
-
-List contract v 2 is deployed to mumbai network at address 0x572aC98bDea8950f348d2C66945d4E5312B35bbe  
-https://mumbai.polygonscan.com/address/0x572aC98bDea8950f348d2C66945d4E5312B35bbe
-Implementation contracts are deployed to:  
-v1:  0xd58bf69dabcaefe8d1ead6327190ff215f5b0c3f
+v1:  0x1ca9d60c1561fff48f073ff450d25b9545e660d6
 
 
-List contract v 3 is deployed to mumbai network at address 0x3990747e22AFA4f3Ff8F84c99209B562b40b509c  
-https://mumbai.polygonscan.com/address/0x3990747e22AFA4f3Ff8F84c99209B562b40b509c
-Implementation contracts are deployed to:  
-v1:  0xbaa0d0df5046081aa6d80fa77e6113be1cc7be11
 
-
-ListHash deployed to Goerli: 0x49549aD4872Bb0F487eF8947FcdFCd0Af1479B71
-https://goerli.etherscan.io/address/0x49549aD4872Bb0F487eF8947FcdFCd0Af1479B71
+ListHash deployed to Goerli: 0x018b46ce6eE624e49d233983E8e3036FB0488b41
+https://goerli.etherscan.io/address/0x018b46ce6eE624e49d233983E8e3036FB0488b41
 
 Verifier contract is deployed to rinkeby network at address 0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb
 https://rinkeby.etherscan.io/address/0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb
@@ -47,6 +35,8 @@ https://rinkeby.etherscan.io/address/0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb
 VerifierAdd contract is deployed to mumbai network at address 0x613c90582B1668cA6BD31A42803c9e37596a836B
 https://mumbai.polygonscan.com/address/0x613c90582B1668cA6BD31A42803c9e37596a836B
 
+VerifierPermalink contract is deployed to mumbai network at address 0xb6514E22ef505d8bD1AF6A39cB0FB578c9241515
+https://mumbai.polygonscan.com/address/0xb6514E22ef505d8bD1AF6A39cB0FB578c9241515
 ### Usage:
 
 	List contract: add( address, version, hash )
