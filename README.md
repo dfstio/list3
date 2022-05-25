@@ -43,6 +43,13 @@ v1:  0x6e706fac3d10c6bd7dbe86eaf5d6e65ed31d3224
 ListHash deployed to Goerli: 0x68DB2cf0E076E3DDBdb66179760Da4a9BB232d33  
 https://goerli.etherscan.io/address/0x68DB2cf0E076E3DDBdb66179760Da4a9BB232d33  
 
+Verifier deployed to Goerli: 0xd58bf69DaBcAEfe8D1EAd6327190ff215F5b0c3f  
+https://goerli.etherscan.io/address/0xd58bf69DaBcAEfe8D1EAd6327190ff215F5b0c3f 
+
+Score example contract deployed to Goerli: 0xA21f65304d2Ab87ccd7565Fb9cA2d984aD767646  
+https://goerli.etherscan.io/address/0xA21f65304d2Ab87ccd7565Fb9cA2d984aD767646 
+
+
 VerifierAdd contract is deployed to mumbai network at address 0x613c90582B1668cA6BD31A42803c9e37596a836B  
 https://mumbai.polygonscan.com/address/0x613c90582B1668cA6BD31A42803c9e37596a836B  
 
@@ -67,15 +74,17 @@ CLI for list and zero knowledge proofs of inclusion and exclusion
 Options:  
   -V, --version                           output the version number  
   -h, --help                              display help for command  
-
-Commands:  
-  add [options] <name> <version>     Add to SMT key-value pair: key is permalink of claim, value is version
-  update [options] <name> <version>  Update value of SMT key: key is permalink of claim, value is version
-  revoke [options] <name>            Revoke SMT key: key is permalink of claim
-  claim <name>                       Generate new claim
-  ethereum                           Verify Version and Roothash Mumbai events on Ethereum Goerli
-  verify                             Verify proof
-  help [command]                     display help for command 
+ 
+Commands:
+  add [options] <name> <version>         Add to SMT key-value pair: key is permalink of claim, value is version
+  update [options] <name> <version>      Update value of SMT key: key is permalink of claim, value is version
+  revoke [options] <name>                Revoke SMT key: key is permalink of claim
+  claim <name>                           Generate new claim
+  ethereum                               Verify Version and Roothash Mumbai events on Ethereum Goerli
+  verify [options] <permalink>           Verify ZK proof of inclusion or exclusion on Goerli
+  score [options] <permalink> <version>  Example: Add score with transaction on Goerli with ZK proof of inclusion or exclusion
+  snarkverify                            Verify proof in ./proof folder by executing snarkjs
+  help [command]                         display help for command
 ```
 
 ### add
@@ -133,7 +142,7 @@ Options:
 ### claim
 New claim is being created in ./data folder. 
 Private key is being generated and permalink of a claim is 
-peterson hash of private key  
+peterson hash of private key.   
 ```
 Usage: list claim [options] <name>  
 
@@ -144,6 +153,36 @@ Arguments:
 
 Options:  
   -h, --help  display help for command
+```  
+
+### score
+Test transaction on Goerli   
+```
+Usage: list score [options] <permalink> <version>
+
+Example: Add score with transaction on Goerli with ZK proof of inclusion or exclusion
+
+Arguments:
+  permalink        claim permalink
+  version          claim version
+
+Options:
+  -relay <number>  relayId to use
+  -h, --help       display help for command
+```  
+### verify
+Verify ZK proof of inclusion or exclusion on Goerli   
+```
+Usage: list verify [options] <permalink>
+
+Verify ZK proof of inclusion or exclusion on Goerli
+
+Arguments:
+  permalink        claim permalink
+
+Options:
+  -relay <number>  relayId to use
+  -h, --help       display help for command
 ```  
 
 ## TODO

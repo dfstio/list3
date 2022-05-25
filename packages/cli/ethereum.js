@@ -1,4 +1,3 @@
-
 const {RPC_GOERLI, RPC_MUMBAI, KEY_OWNER, LISTHASH_CONTRACT_ADDRESS, LIST_CONTRACT_ADDRESS } = require('@list/config');
 const ListHashJSON = require("@list/contracts/abi/contracts/listhash.sol/ListHash.json");
 const ListJSON = require("@list/contracts/abi/contracts/list.sol/List.json");
@@ -83,7 +82,51 @@ async function checkEthereum()
 
 };
 
+async function getProof(relayId)
+{
+	 let proof = 0;
+	 const posClient = new POSClient();
+	 await posClient.init(
+	 {
+	  log: false,
+      network: "testnet",
+      version: "mumbai",
+      parent: {
+		  provider: new ethers.Wallet(KEY_OWNER, ethereumprovider),
+		  defaultConfig: {
+			from : address
+		  }
+	  },
+	  child: {
+		   provider: new ethers.Wallet(KEY_OWNER, maticprovider),
+		   defaultConfig: {
+			 from : address
+		   }
+	  }
+    });
+    
+    let events = await list.queryFilter('Version');
+    console.log("Found ", events.length, "Version events");
+    
+    let i = events.length - 1;
+    while( i >= 0)
+    {    
+		 const txHash = events[i].transactionHash;
+		 const isReady = await posClient.isCheckPointed(txHash);
+		 console.log("Event ", i, " isCheckPointed: ", isReady, "relayId", events[i].args.relayId);
+		 if( isReady && (events[i].args.relayId == relayId))
+		 {
+			 proof = await posClient.exitUtil.buildPayloadForExit(txHash, "0x40779ce7063d5f55ba195a4101faa644098b5c4e985b7d57f5f326e4f6e2af84")
+			 console.log("proof: ", proof);    
+			 break;		
+		 } else i--; 
+	};
+	
+	return proof;
+};
+
 
 module.exports = {
-	checkEthereum
+	checkEthereum,
+	getProof
 }

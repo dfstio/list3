@@ -1,9 +1,12 @@
-const {RPC_MUMBAI, RELAY, LIST_CONTRACT_ADDRESS, PROOF_DIR } = require('@list/config');
+const {RPC_MUMBAI, RPC_GOERLI, RELAY, LIST_CONTRACT_ADDRESS, 
+		VERIFIER_ADDRESS, PROOF_DIR } = require('@list/config');
 const ListJSON = require("@list/contracts/abi/contracts/list.sol/List.json");
-const vKeyAdd = require("../circuit/verification_keyadd.json");
-const vKeyUpdate = require("../circuit/verification_keyupdate.json");
-const vKeyRevoke = require("../circuit/verification_keyrevoke.json");
-const vKeyAddRevoked = require("../circuit/verification_keyaddrevoked.json");
+const VerifierJSON = require("@list/contracts/abi/contracts/verifier.sol/Verifier.json");
+const vKey = require("@list/circuit/verification_key.json");
+const vKeyAdd = require("@list/circuit/verification_keyadd.json");
+const vKeyUpdate = require("@list/circuit/verification_keyupdate.json");
+const vKeyRevoke = require("@list/circuit/verification_keyrevoke.json");
+const vKeyAddRevoked = require("@list/circuit/verification_keyaddrevoked.json");
 const ethers = require("ethers");
 const newMemEmptyTrie = require("circomlibjs").newMemEmptyTrie;
 const provider = new ethers.providers.StaticJsonRpcProvider(RPC_MUMBAI);
@@ -242,7 +245,46 @@ async function addrevoked(tree, list, claim, permalink, name, relayId)
 	 }
 };
 
+async function verify(permalink, relayId)
+{
+	 
+	 let {tree, list} = await gettree(relayId); 	
+	 const input = await generateVerifierInput(tree, permalink);
+	 
+	 const result = await snark(input, 
+								"./packages/circuit/smt_js/smt.wasm", 
+								"./packages/circuit/smt_0001.zkey",
+								vKey);
+	 													
+	 if( result.isVerificationOK && (tree.F.toObject(tree.root).toString() == result.publicSignals[0]))
+	 {
+	 	console.log("Verifying on Goerli...");
+	 	const ethereumprovider = new ethers.providers.JsonRpcProvider(RPC_GOERLI);
+	 	const verifier = new ethers.Contract(VERIFIER_ADDRESS, VerifierJSON, ethereumprovider);
+	 	const proof = result.proof;
+	 	const verified = await verifier.verifyProof(
+	 		[proof.pi_a[0], proof.pi_a[1]],
+	 		[[proof.pi_b[0][1],proof.pi_b[0][0]],[proof.pi_b[1][1],proof.pi_b[1][0]]],
+	 		[proof.pi_c[0],proof.pi_c[1]],
+	 		result.publicSignals
+	 	);
+	 
+		console.log("Verified: ", verified);
+	 }
+};
 
+async function verifierProof(permalink, relayId)
+{
+	 
+	 let {tree, list} = await gettree(relayId); 	
+	 const input = await generateVerifierInput(tree, permalink);
+	 
+	 const result = await snark(input, 
+								"./packages/circuit/smt_js/smt.wasm", 
+								"./packages/circuit/smt_0001.zkey",
+								vKey);
+	 return result;												
+};
 
 async function generateAddInput(tree, _key, _value) 
 {
@@ -356,6 +398,32 @@ async function generateAddRevokedInput(tree, _key)
 	return input;
 }
 
+async function generateVerifierInput(tree, _key) 
+{
+	const key = tree.F.e(_key);
+    const res = await tree.find(key);
+
+    console.log("Key found:", res.found, "for key", _key);
+    let siblings = res.siblings;
+    for (let i=0; i<siblings.length; i++) siblings[i] = tree.F.toObject(siblings[i]);
+    while (siblings.length<16) siblings.push(0);
+
+    const input = {
+			enabled: 1,
+			fnc: res.found? 0 : 1,
+			root: tree.F.toObject(tree.root),
+			siblings: siblings,
+			oldKey: res.found? 0 : (res.isOld0 ? 0 : tree.F.toObject(res.notFoundKey)),
+			oldValue: res.found? 0 : (res.isOld0 ? 0 : tree.F.toObject(res.notFoundValue)),
+			isOld0: res.found? 0 : (res.isOld0 ? 1 : 0),
+			key: tree.F.toObject(key),
+			value: res.found? tree.F.toObject(res.foundValue) : 0
+		};
+		
+    console.log("Input: ");
+    console.log( JSON.stringify(input, (_, v) => typeof v === 'bigint' ? v.toString() : v, 1));
+	return input;
+}
 
 async function save(data, name) 
 {
@@ -371,5 +439,7 @@ async function save(data, name)
 module.exports = {
     add,
     update,
-    revoke
+    revoke,
+    verify,
+    verifierProof
 }

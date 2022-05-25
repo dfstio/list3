@@ -2,8 +2,9 @@
 const { PROOF_DIR } = require('@list/config');
 const { Command } = require('commander');
 const program = new Command();
-const { add, update, revoke } = require("./list");
+const { add, update, revoke, verify } = require("./list");
 const { claim } = require("./claim");
+const { score } = require("./score");
 const { checkEthereum } = require("./ethereum");
 
 const util = require('util')
@@ -62,8 +63,30 @@ program.command('ethereum')
 	await checkEthereum();
   }); 
   
+  
 program.command('verify')
-  .description('Verify proof')
+  .description('Verify ZK proof of inclusion or exclusion on Goerli')
+  .argument('<permalink>', 'claim permalink')
+  .option('-relay <number>', 'relayId to use')
+  .action(async (permalink, options) => {
+  	const relayId = options.Relay? options.Relay : 1 ;
+    console.log('Verifying claim', permalink, 'on Goerli, SMT relay', relayId);
+    await verify(permalink, relayId);
+  });    
+  
+program.command('score')
+  .description('Example: Add score with transaction on Goerli with ZK proof of inclusion or exclusion')
+  .argument('<permalink>', 'claim permalink')
+  .argument('<version>', 'claim version')
+  .option('-relay <number>', 'relayId to use')
+  .action(async (permalink, version, options) => {
+  	const relayId = options.Relay? options.Relay : 1 ;
+    console.log('Adding score of ', permalink, "version", version, "SMT relay", relayId);
+    await score(permalink, version, relayId);
+  });    
+  
+program.command('snarkverify')
+  .description('Verify proof in ./proof folder by executing snarkjs')
   .action(async () => {
     console.log('Verifying proof...');
     let out = 'snarkjs cli call failed';

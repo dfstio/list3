@@ -14,6 +14,7 @@
   "dependencies": {
     "@list/config": "3.0.0",
     "@list/contracts": "3.0.0",
+    "@list/circuit": "3.0.0",
     "@maticnetwork/maticjs": "^3.3.0",
     "@maticnetwork/maticjs-ethers": "^1.0.2",
     "@maticnetwork/maticjs-web3": "^1.0.1",

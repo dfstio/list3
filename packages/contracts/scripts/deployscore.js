@@ -17,12 +17,13 @@ async function main() {
   const owner = accounts[0].address;
   console.log("Deployer address:", owner);
   // We get the contract to deploy
-  const Verifier = await hre.ethers.getContractFactory("Verifier");
-  const verifier = await Verifier.deploy();
+  const Verifier = await hre.ethers.getContractFactory("Score");
+  const verifier = await Verifier.deploy("0xd58bf69DaBcAEfe8D1EAd6327190ff215F5b0c3f",
+  										 "0x68DB2cf0E076E3DDBdb66179760Da4a9BB232d33");
 
   await verifier.deployed();
 
-  console.log("Verifier deployed to:", verifier.address);
+  console.log("Score deployed to:", verifier.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
