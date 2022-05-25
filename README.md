@@ -38,8 +38,8 @@ Implementation contracts are deployed to:
 v1:  0xbaa0d0df5046081aa6d80fa77e6113be1cc7be11
 
 
-ListHash deployed to Goerli: 0x3C383Cb6067B95d709302435CFF1e017Ba795705
-https://goerli.etherscan.io/address/0x3C383Cb6067B95d709302435CFF1e017Ba795705
+ListHash deployed to Goerli: 0x49549aD4872Bb0F487eF8947FcdFCd0Af1479B71
+https://goerli.etherscan.io/address/0x49549aD4872Bb0F487eF8947FcdFCd0Af1479B71
 
 Verifier contract is deployed to rinkeby network at address 0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb
 https://rinkeby.etherscan.io/address/0xD7737dDf725f5006cCc682b337b4cc4dfd5c04fb

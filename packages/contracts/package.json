@@ -34,7 +34,7 @@
     "upgradelist": "hardhat run --network mumbai scripts/upgradelist.js",
     "accounts": "hardhat accounts",
     "verifyverifier": "hardhat etherscan-verify --network rinkeby --api-key FQ1NYZXPQIICKE7U41VSRB7TPKZJQKI7SH",
-    "verifylisthash": "hardhat verify --network goerli 0x3C383Cb6067B95d709302435CFF1e017Ba795705 0x2890bA17EfE978480615e330ecB65333b880928e 0x3990747e22AFA4f3Ff8F84c99209B562b40b509c ",
+    "verifylisthash": "hardhat verify --network goerli 0x49549aD4872Bb0F487eF8947FcdFCd0Af1479B71 0x2890bA17EfE978480615e330ecB65333b880928e 0x3990747e22AFA4f3Ff8F84c99209B562b40b509c ",
     "verifymumbai": "hardhat verify --network mumbai 0xbaa0d0df5046081aa6d80fa77e6113be1cc7be11",
     "verify": "hardhat verify --network rinkeby 0x355Bd8a9898751b779Bf621650d70eEa93FD65eC",
     "test": "echo \"Error: no test specified\" && exit 1",

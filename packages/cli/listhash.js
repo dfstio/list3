@@ -41,8 +41,8 @@ async function main()
 	  }
     });
     
-    const events = await list.queryFilter('Version');
-    console.log("Found ", events.length, " events");
+    let events = await list.queryFilter('Version');
+    console.log("Found ", events.length, "Version events");
     
     let i = events.length - 1;
     while( i >= 0)
@@ -57,9 +57,30 @@ async function main()
 			 const result = await listhash.getVersion(proof);
 			 console.log("Result: ");
 			 console.log(JSON.stringify(result, (_, v) => typeof v === 'bigint' ? v.toString() : v, 1));
+			 break;		
+		 } else i--; 
+	};
+	
+    events = await list.queryFilter('Roothash');
+    console.log("Found ", events.length, " Roothash events");
+    
+    i = events.length - 1;
+    while( i >= 0)
+    {    
+		 const txHash = events[i].transactionHash;
+		 const isReady = await posClient.isCheckPointed(txHash);
+		 console.log("Event ", i, " isCheckPointed: ", isReady);
+		 if( isReady )
+		 {
+			 const proof = await posClient.exitUtil.buildPayloadForExit(txHash, "0xf467dc3352c24e3163f55b7f0140fcc06603b14efe5ea1997d0b32da739f4101")
+			 console.log("proof: ", proof);    
+			 const result = await listhash.getRoothash(proof);
+			 console.log("Result: ");
+			 console.log(JSON.stringify(result, (_, v) => typeof v === 'bigint' ? v.toString() : v, 1));
 			 return;
 		 } else i--; 
 	};
+
 };
 
 
