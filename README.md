@@ -81,35 +81,33 @@ https://mumbai.polygonscan.com/address/0xb6514E22ef505d8bD1AF6A39cB0FB578c924151
 Claim version is added to blockchain checking 2 ZK proofs:
 1) That permalink is owned by claim (executing ZK circuit calculating peterson hash)
 2) That new leaf is correctly inserted into tree
+	Usage: list add [options] <name> <version>  
 
-	  Usage: list add [options] <name> <version>  
+	Add to SMT key-value pair: key is permalink of claim, value is version  
 
-	  Add to SMT key-value pair: key is permalink of claim, value is version  
+	Arguments:  
+	  name             claim name  
+	  version          claim version, must be 2 or bigger  
 
-	  Arguments:  
-		name             claim name  
-		version          claim version, must be 2 or bigger  
-
-	  Options:  
-		-relay <number>  relayId to use  
-		-h, --help       display help for command  
+	Options:  
+	  -relay <number>  relayId to use  
+	  -h, --help       display help for command  
 	  
 ### update
 Claim version is updated to blockchain checking 2 ZK proofs:
 1) That permalink is owned by claim (executing ZK circuit calculating peterson hash)
 2) That new leaf is correctly updated on tree
+	Usage: list update [options] <name> <version>
 
-	  Usage: list update [options] <name> <version>
+	Update value of SMT key: key is permalink of claim, value is version
 
-	  Update value of SMT key: key is permalink of claim, value is version
+	Arguments:
+	  name             claim name
+	  version          claim version, must be 3 or bigger
 
-	  Arguments:
-		name             claim name
-		version          claim version, must be 3 or bigger
-
-	  Options:
-		-relay <number>  relayId to use
-		-h, --help       display help for command
+	Options:
+	  -relay <number>  relayId to use
+	  -h, --help       display help for command
 
 ### revoke	  
 Claim version is revoked on blockchain checking 2 ZK proofs:
