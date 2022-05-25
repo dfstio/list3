@@ -78,6 +78,11 @@ https://mumbai.polygonscan.com/address/0xb6514E22ef505d8bD1AF6A39cB0FB578c924151
 
 
 ### add
+Claim version is added to blockchain checking 2 ZK proofs:
+1) That permalink is owned by claim (executing ZK circuit calculating peterson hash)
+2) That new leaf is correctly inserted into tree
+
+
 	Usage: list add [options] <name> <version>  
 
 	Add to SMT key-value pair: key is permalink of claim, value is version  
@@ -91,6 +96,10 @@ https://mumbai.polygonscan.com/address/0xb6514E22ef505d8bD1AF6A39cB0FB578c924151
 	  -h, --help       display help for command  
 	  
 ### update
+Claim version is updated to blockchain checking 2 ZK proofs:
+1) That permalink is owned by claim (executing ZK circuit calculating peterson hash)
+2) That new leaf is correctly updated on tree
+
 	Usage: list update [options] <name> <version>
 
 	Update value of SMT key: key is permalink of claim, value is version
@@ -104,6 +113,10 @@ https://mumbai.polygonscan.com/address/0xb6514E22ef505d8bD1AF6A39cB0FB578c924151
 	  -h, --help       display help for command
 
 ### revoke	  
+Claim version is revoked on blockchain checking 2 ZK proofs:
+1) That permalink is owned by claim (executing ZK circuit calculating peterson hash)
+2) That new leaf is correctly updated on tree (if existed before) or inserted to tree
+
 	Usage: list revoke [options] <name>
 
 	Revoke SMT key: key is permalink of claim
@@ -116,6 +129,10 @@ https://mumbai.polygonscan.com/address/0xb6514E22ef505d8bD1AF6A39cB0FB578c924151
 	  -h, --help       display help for command
   
 ### claim
+New claim is being created in ./data folder. 
+Private key is being generated and permalink of a claim is 
+peterson hash of private key
+
 	Usage: list claim [options] <name>  
 
 	Generate new claim  
