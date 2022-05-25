@@ -35,16 +35,25 @@ https://mumbaifaucet.com/
 
 ## Contracts
 
-List contract is deployed to mumbai network at address 0x059c6E0c38bea3C11f55d46a4E4aaC5d8E80cb82  
-https://mumbai.polygonscan.com/address/0x059c6E0c38bea3C11f55d46a4E4aaC5d8E80cb82  
+List contract is deployed to mumbai network at address 0x91478CfAFbD29F4c89CD2e4e89506AFFb89651df  
+https://mumbai.polygonscan.com/address/0x91478CfAFbD29F4c89CD2e4e89506AFFb89651df  
 Implementation contracts are deployed to:  
-v1:  0x1ca9d60c1561fff48f073ff450d25b9545e660d6
+v1:  0x6e706fac3d10c6bd7dbe86eaf5d6e65ed31d3224
 
-ListHash deployed to Goerli: 0x018b46ce6eE624e49d233983E8e3036FB0488b41  
-https://goerli.etherscan.io/address/0x018b46ce6eE624e49d233983E8e3036FB0488b41  
+ListHash deployed to Goerli: 0x68DB2cf0E076E3DDBdb66179760Da4a9BB232d33  
+https://goerli.etherscan.io/address/0x68DB2cf0E076E3DDBdb66179760Da4a9BB232d33  
 
 VerifierAdd contract is deployed to mumbai network at address 0x613c90582B1668cA6BD31A42803c9e37596a836B  
 https://mumbai.polygonscan.com/address/0x613c90582B1668cA6BD31A42803c9e37596a836B  
+
+VerifierUpdate contract is deployed to mumbai network at address 0xcE46ffc2f53B9343114b0fD2583ab3C10ce46BE2  
+https://mumbai.polygonscan.com/address/0xcE46ffc2f53B9343114b0fD2583ab3C10ce46BE2  
+
+VerifierRevoke contract is deployed to mumbai network at address 0x62Bfb94b472044F09125a7662C81FEf36D22D305 
+https://mumbai.polygonscan.com/address/0x62Bfb94b472044F09125a7662C81FEf36D22D305
+
+VerifierAddRevoked contract is deployed to mumbai network at address 0x25c593AAeaA06a41881186a8cE174C9AB0ec537e 
+https://mumbai.polygonscan.com/address/0x25c593AAeaA06a41881186a8cE174C9AB0ec537e
 
 VerifierPermalink contract is deployed to mumbai network at address 0xb6514E22ef505d8bD1AF6A39cB0FB578c9241515  
 https://mumbai.polygonscan.com/address/0xb6514E22ef505d8bD1AF6A39cB0FB578c9241515  
@@ -59,13 +68,13 @@ https://mumbai.polygonscan.com/address/0xb6514E22ef505d8bD1AF6A39cB0FB578c924151
 	  -h, --help                              display help for command  
 
 	Commands:  
-	  add [options] <name> <version>          Add to SMT key-value pair: key is permalink of claim, value is version  
-	  update [options] <permalink> <version>  Update value of SMT key: key is permalink, value is version  
-	  revoke [options] <permalink>            Revoke SMT key: key is permalink  
-	  claim <name>                            Generate new claim  
-	  ethereum                                Verify Version and Roothash Mumbai events on Ethereum Goerli  
-	  verify                                  Verify proof  
-	  help [command]                          display help for command  
+	  add [options] <name> <version>     Add to SMT key-value pair: key is permalink of claim, value is version
+	  update [options] <name> <version>  Update value of SMT key: key is permalink of claim, value is version
+	  revoke [options] <name>            Revoke SMT key: key is permalink of claim
+	  claim <name>                       Generate new claim
+	  ethereum                           Verify Version and Roothash Mumbai events on Ethereum Goerli
+	  verify                             Verify proof
+	  help [command]                     display help for command 
 
 
 ### add
@@ -80,6 +89,31 @@ https://mumbai.polygonscan.com/address/0xb6514E22ef505d8bD1AF6A39cB0FB578c924151
 	Options:  
 	  -relay <number>  relayId to use  
 	  -h, --help       display help for command  
+	  
+### update
+	Usage: list update [options] <name> <version>
+
+	Update value of SMT key: key is permalink of claim, value is version
+
+	Arguments:
+	  name             claim name
+	  version          claim version, must be 3 or bigger
+
+	Options:
+	  -relay <number>  relayId to use
+	  -h, --help       display help for command
+
+### revoke	  
+	Usage: list revoke [options] <name>
+
+	Revoke SMT key: key is permalink of claim
+
+	Arguments:
+	  name             claim name
+
+	Options:
+	  -relay <number>  relayId to use
+	  -h, --help       display help for command
   
 ### claim
 	Usage: list claim [options] <name>  
@@ -94,8 +128,6 @@ https://mumbai.polygonscan.com/address/0xb6514E22ef505d8bD1AF6A39cB0FB578c924151
   
 
 ## TODO
-- update
-- revoke
 - transfer
 - ZK proof of exclusion for Ethereum
 - extend scope to roothashes of identity

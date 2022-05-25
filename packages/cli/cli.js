@@ -26,24 +26,24 @@ program.command('add')
   });
   
 program.command('update')
-  .description('Update value of SMT key: key is permalink, value is version')
-  .argument('<permalink>', 'object permalink')
-  .argument('<version>', 'object version, must be 2 or bigger')
+  .description('Update value of SMT key: key is permalink of claim, value is version')
+  .argument('<name>', 'claim name')
+  .argument('<version>', 'claim version, must be 3 or bigger')
   .option('-relay <number>', 'relayId to use')
-  .action(async (permalink, version, options) => {
+  .action(async (name, version, options) => {
   	const relayId = options.Relay? options.Relay : 1 ;
-    console.log('updating key', permalink, 'to version' , version, 'on SMT relay', relayId);
-    console.log("Not implemented yet");
+    console.log('updating', name, 'to version' , version, 'on SMT relay', relayId);
+    await update(name, version, relayId);
   });  
 
 program.command('revoke')
-  .description('Revoke SMT key: key is permalink')
-  .argument('<permalink>', 'object permalink')
+  .description('Revoke SMT key: key is permalink of claim')
+  .argument('<name>', 'claim name')
   .option('-relay <number>', 'relayId to use')
-  .action(async (permalink, options) => {
+  .action(async (name, options) => {
   	const relayId = options.Relay? options.Relay : 1 ;
-    console.log('revoking key', permalink, 'on SMT relay', relayId);
-    console.log("Not implemented yet");
+    console.log('revoking claim', name, 'on SMT relay', relayId);
+    await revoke(name, relayId);
   });  
 
 program.command('claim')

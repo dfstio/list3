@@ -18,6 +18,34 @@ interface IVerifierAdd {
         ) external view returns (bool r);
 } 
 
+interface IVerifierUpdate {        
+            function verifyProof(
+            uint[2] memory a,
+            uint[2][2] memory b,
+            uint[2] memory c,
+            uint[5] memory input
+        ) external view returns (bool r);
+}
+
+
+interface IVerifierRevoke {        
+            function verifyProof(
+            uint[2] memory a,
+            uint[2][2] memory b,
+            uint[2] memory c,
+            uint[4] memory input
+        ) external view returns (bool r);
+}
+
+interface IVerifierAddRevoked {
+    function verifyProof(
+            uint[2] memory a,
+            uint[2][2] memory b,
+            uint[2] memory c,
+            uint[4] memory input
+        ) external view returns (bool r);
+} 
+
 interface IVerifierPermalink {
 
     function verifyProof(
@@ -27,6 +55,9 @@ interface IVerifierPermalink {
             uint[1] memory input
         ) external view returns (bool r);
 } 
+        
+
+        
         
 contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 {
@@ -67,12 +98,22 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 		event ShutdownRelay(uint128 indexed relayId);
 
 		IVerifierAdd verifierAdd;
+		IVerifierUpdate verifierUpdate;
+		IVerifierRevoke verifierRevoke;
+		IVerifierAddRevoked verifierAddRevoked;
 		IVerifierPermalink verifierPermalink;
 
-		function initialize(IVerifierAdd _verifierAdd, IVerifierPermalink _verifierPermalink) public initializer {
+		function initialize(IVerifierAdd _verifierAdd, 
+							IVerifierUpdate _verifierUpdate, 
+							IVerifierRevoke _verifierRevoke, 
+							IVerifierAddRevoked _verifierAddRevoked,
+							IVerifierPermalink _verifierPermalink) public initializer {
 			 __Ownable_init();
 			 __Pausable_init();
 			 verifierAdd = _verifierAdd;
+			 verifierUpdate = _verifierUpdate;
+			 verifierRevoke = _verifierRevoke;
+			 verifierAddRevoked = _verifierAddRevoked;
 			 verifierPermalink = _verifierPermalink;
 			 relays.push();
 		 }
@@ -158,19 +199,33 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 			  versions[permalink].relayId = relayId;
 			  emit Version(permalink, version, relayId, newRoot); 
 		 }
+
+
 		 
 		 
-		 function update(	uint256 permalink, 
-		 					uint128 version,
-		 					uint256 oldRoot,
-		 					uint256 newRoot)
+		 function update( uint[2] memory a,
+						  uint[2][2] memory b,
+						  uint[2] memory c,
+						  uint[5] memory input,
+						  uint[2] memory ap,
+						  uint[2][2] memory bp,
+						  uint[2] memory cp,
+						  uint[1] memory inputp) 
 			 external whenNotPaused onlyRelay
 		 { 
-			 // TODO: add ZK verification of newRoot
+			  require( verifierUpdate.verifyProof(a, b, c, input) == true, "LIST05a wrong proof");
+              require( verifierPermalink.verifyProof(ap, bp, cp, inputp) == true, "LIST05b wrong proof");
+			  uint256 newRoot 	= input[0];
+			  uint256 oldRoot 	= input[1];
+			  uint128 oldVersion = uint128(input[2]);
+			  uint256 permalink = input[3];
+			  require(permalink == inputp[0], "LIST05c wrong permalink");
+			  uint128 version = uint128(input[4]);
 			  uint128 relayId = relaysIndex[msg.sender];
 			  require(oldRoot == relays[relayId].roothash, "LIST05 wrong roothash");
 			  require(versions[permalink].relayId == relayId, "LIST06 wrong relay");
-			  require((version - versions[permalink].version) == 1, "LIST07 wrong version increment");
+			  require(oldVersion == versions[permalink].version, "LIST07a wrong old version");
+			  require((version - oldVersion) == 1, "LIST07b wrong version increment");
 			  
 			  relays[relayId].timestamp = block.timestamp;
 			  relays[relayId].roothash = newRoot;
@@ -180,15 +235,28 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 			  emit Version(permalink, version, relayId, newRoot); 
 		 }
 		 
-		 function revoke(	uint256 permalink, 
-		 					uint256 oldRoot,
-		 					uint256 newRoot)
+		 function revoke( uint[2] memory a,
+						  uint[2][2] memory b,
+						  uint[2] memory c,
+						  uint[4] memory input,
+						  uint[2] memory ap,
+						  uint[2][2] memory bp,
+						  uint[2] memory cp,
+						  uint[1] memory inputp) 
+
 			 external whenNotPaused onlyRelay
 		 { 
-			 // TODO: add ZK verification of newRoot
+			  require( verifierRevoke.verifyProof(a, b, c, input) == true, "LIST08a wrong proof");
+              require( verifierPermalink.verifyProof(ap, bp, cp, inputp) == true, "LIST08b wrong proof");
+			  uint256 newRoot 	= input[0];
+			  uint256 oldRoot 	= input[1];
+			  uint256 permalink = input[2];
+			  require(permalink == inputp[0], "LIST08c wrong permalink");
+			  uint128 version = uint128(input[3]);
 			  uint128 relayId = relaysIndex[msg.sender];
-			  require(oldRoot == relays[relayId].roothash, "LIST08 wrong roothash");
-			  require(versions[permalink].relayId == relayId, "LIST09 wrong relay");
+			  require(oldRoot == relays[relayId].roothash, "LIST08d wrong roothash");
+			  require(versions[permalink].relayId == relayId, "LIST08e wrong relay");
+			  require(version == 1, "LIST08f wrong version");
 			  
 			  relays[relayId].timestamp = block.timestamp;
 			  relays[relayId].roothash = newRoot;
@@ -198,13 +266,44 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 			  emit Version(permalink, 1, relayId, newRoot); 
 		 }
 
+		 function addrevoked( uint[2] memory a,
+							  uint[2][2] memory b,
+							  uint[2] memory c,
+							  uint[4] memory input,
+							  uint[2] memory ap,
+							  uint[2][2] memory bp,
+							  uint[2] memory cp,
+							  uint[1] memory inputp) 
+			 external whenNotPaused onlyRelay
+		 { 
+              require( verifierAddRevoked.verifyProof(a, b, c, input) == true, "LIST10a wrong proof");
+              require( verifierPermalink.verifyProof(ap, bp, cp, inputp) == true, "LIST10b wrong proof");
+			  uint128 relayId = relaysIndex[msg.sender];
+			  uint256 newRoot 	= input[0];
+			  uint256 oldRoot 	= input[1];
+			  uint256 permalink = input[2];
+			  require(permalink == inputp[0], "LIST10c wrong permalink");
+			  uint128 version 	= uint128(input[3]);
+			  require(oldRoot == relays[relayId].roothash, "LIST10d wrong roothash");
+			  require(versions[permalink].relayId == 0, "LIST10e already added");
+			  require(version == 1, "LIST10e wrong version");
+			  
+			  relays[relayId].timestamp = block.timestamp;
+			  relays[relayId].roothash = newRoot;
+			  relays[relayId].counter++;
+			  
+			  versions[permalink].version = 1;
+			  versions[permalink].relayId = relayId;
+			  emit Version(permalink, 1, relayId, newRoot); 
+		 }
+
 		 // Allow transfer from relay
 		 function allowTransfer(uint256 permalink, uint256 roothash)
 			 external whenNotPaused onlyRelay
 		 { 
 			  uint128 relayId = relaysIndex[msg.sender];
-			  require(roothash == relays[relayId].roothash, "LIST10 wrong roothash");
-			  require(versions[permalink].relayId == relayId, "LIST11 wrong relay");
+			  require(roothash == relays[relayId].roothash, "LIST11a wrong roothash");
+			  require(versions[permalink].relayId == relayId, "LIST11b wrong relay");
 			  allowedTransfers[relayId][permalink] = roothash;	
 		 }
 

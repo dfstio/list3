@@ -35,7 +35,7 @@
     "accounts": "hardhat accounts",
     "verifyverifier": "hardhat etherscan-verify --network rinkeby --api-key FQ1NYZXPQIICKE7U41VSRB7TPKZJQKI7SH",
     "verifylisthash": "hardhat verify --network goerli 0x018b46ce6eE624e49d233983E8e3036FB0488b41 0x2890bA17EfE978480615e330ecB65333b880928e 0x059c6E0c38bea3C11f55d46a4E4aaC5d8E80cb82",
-    "verifymumbai": "hardhat verify --network mumbai 0x1ca9d60c1561fff48f073ff450d25b9545e660d6",
+    "verifymumbai": "hardhat verify --network mumbai 0x6e706fac3d10c6bd7dbe86eaf5d6e65ed31d3224",
     "verify": "hardhat verify --network rinkeby 0x355Bd8a9898751b779Bf621650d70eEa93FD65eC",
     "test": "echo \"Error: no test specified\" && exit 1",
     "size": "hardhat size-contracts",
