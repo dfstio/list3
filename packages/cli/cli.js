@@ -3,6 +3,7 @@ const { PROOF_DIR } = require('@list/config');
 const { Command } = require('commander');
 const program = new Command();
 const { add, update, revoke } = require("./list");
+const { claim } = require("./claim");
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
 
@@ -43,6 +44,14 @@ program.command('revoke')
     console.log("Not implemented yet");
   });  
 
+program.command('claim')
+  .description('Generate new claim')
+  .argument('<name>', 'claim name')
+  .action(async (name) => {
+    console.log('Creating claim', name);
+	await claim(name);
+  });  
+  
 program.command('verify')
   .description('Verify proof')
   .action(async () => {

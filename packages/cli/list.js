@@ -120,6 +120,7 @@ async function save(data, name)
 		 });
 
 };
+
 async function snark(input, wasm, zkey, vkey) 
 {
     const { proof, publicSignals } = await snarkjs.groth16.fullProve(input, wasm, zkey);
@@ -146,5 +147,6 @@ async function snark(input, wasm, zkey, vkey)
 module.exports = {
     add,
     update,
-    revoke
+    revoke,
+    snark
 }
