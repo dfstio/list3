@@ -81,6 +81,8 @@ https://mumbai.polygonscan.com/address/0xb6514E22ef505d8bD1AF6A39cB0FB578c924151
 Claim version is added to blockchain checking 2 ZK proofs:
 1) That permalink is owned by claim (executing ZK circuit calculating peterson hash)
 2) That new leaf is correctly inserted into tree  
+
+
 	Usage: list add [options] <name> <version>  
 
 	Add to SMT key-value pair: key is permalink of claim, value is version  
@@ -97,6 +99,8 @@ Claim version is added to blockchain checking 2 ZK proofs:
 Claim version is updated to blockchain checking 2 ZK proofs:
 1) That permalink is owned by claim (executing ZK circuit calculating peterson hash)
 2) That new leaf is correctly updated on tree  
+
+
 	Usage: list update [options] <name> <version>
 
 	Update value of SMT key: key is permalink of claim, value is version
