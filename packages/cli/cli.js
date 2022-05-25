@@ -14,13 +14,13 @@ program
 
 program.command('add')
   .description('Add to SMT key-value pair: key is permalink, value is version')
-  .argument('<permalink>', 'object permalink')
-  .argument('<version>', 'object version, must be 2 or bigger')
+  .argument('<name>', 'claim name')
+  .argument('<version>', 'claim version, must be 2 or bigger')
   .option('-relay <number>', 'relayId to use')
-  .action(async (permalink, version, options) => {
+  .action(async (name, version, options) => {
   	const relayId = options.Relay? options.Relay : 1 ;
-    console.log('adding {', permalink, ':' , version, '} pair to SMT relay', relayId);
-    await add(permalink, version, relayId);
+    console.log('adding {', name, ':' , version, '} pair to SMT relay', relayId);
+    await add(name, version, relayId);
   });
   
 program.command('update')

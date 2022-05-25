@@ -1,4 +1,3 @@
-
 const {RPC_MUMBAI, RELAY, LIST_CONTRACT_ADDRESS, PROOF_DIR } = require('@list/config');
 const ListJSON = require("@list/contracts/abi/contracts/list.sol/List.json");
 const vKeyAdd = require("../circuit/verification_keyadd.json");
@@ -7,9 +6,13 @@ const newMemEmptyTrie = require("circomlibjs").newMemEmptyTrie;
 const provider = new ethers.providers.StaticJsonRpcProvider(RPC_MUMBAI);
 const fs = require('fs').promises;
 const snarkjs = require("snarkjs");
+const { snark } = require("./snark");
+const { getPermalink } = require("./claim");
 
 
-async function add(permalink, version, relayId)
+
+
+async function add(name, version, relayId)
 {
 	 
 	 const wallet = new ethers.Wallet(RELAY[relayId]);
@@ -42,22 +45,27 @@ async function add(permalink, version, relayId)
 	 
 
 	 console.log("Old root", tree.F.toObject(tree.root).toString());
+	 
+	 const claim = await getPermalink(name); 
+	 console.log("getPermalink", claim);
+	 const permalink = claim.publicSignals[0]; // out signal of claim circuit 
 	 const input = await generateAddInput(tree, permalink, version);
 	 
-	 const {result, proof, publicSignals} = await snark(input, 
-	 													"./packages/circuit/smtadd_js/smtadd.wasm", 
-	 													"./packages/circuit/smtadd_0001.zkey",
-	 													vKeyAdd);
+	 const result = await snark(input, 
+								"./packages/circuit/smtadd_js/smtadd.wasm", 
+								"./packages/circuit/smtadd_0001.zkey",
+								vKeyAdd);
 	 													
-	 if( result &&  (tree.F.toObject(tree.root).toString() == publicSignals[0]))
+	 if( result.isVerificationOK &&  (tree.F.toObject(tree.root).toString() == result.publicSignals[0]))
 	 {
 	 	console.log("New root", tree.F.toObject(tree.root).toString());
 	 	console.log("Adding keypair to blockchain...");
+	 	const proof = result.proof;
 	 	const tx = await list.add(
 	 		[proof.pi_a[0], proof.pi_a[1]],
 	 		[[proof.pi_b[0][1],proof.pi_b[0][0]],[proof.pi_b[1][1],proof.pi_b[1][0]]],
 	 		[proof.pi_c[0],proof.pi_c[1]],
-	 		publicSignals
+	 		result.publicSignals
 	 	);
 	 
 		console.log("TX sent: ", tx.hash);
@@ -108,7 +116,6 @@ async function generateAddInput(tree, _key, _value)
     
     console.log("Input: ");
     console.log( JSON.stringify(input, (_, v) => typeof v === 'bigint' ? v.toString() : v, 1));
-    await save(input, "input")
 	return input;
 }
 
@@ -121,28 +128,7 @@ async function save(data, name)
 
 };
 
-async function snark(input, wasm, zkey, vkey) 
-{
-    const { proof, publicSignals } = await snarkjs.groth16.fullProve(input, wasm, zkey);
 
-    console.log("Proof: ");
-    console.log(JSON.stringify(proof, null, 1));
-    await save(proof, "proof");
-    
-    console.log("publicSignals: ");
-    console.log(JSON.stringify(publicSignals, null, 1));
-    await save(publicSignals, "public");
-    await save(vkey, "verification_key");
-    
-    const result = await snarkjs.groth16.verify(vkey, publicSignals, proof);
-
-    if (result === true) {
-        console.log("Verification OK");
-    } else {
-        console.log("Invalid proof");
-    }
-    return {result, proof, publicSignals};
-}
 
 module.exports = {
     add,
