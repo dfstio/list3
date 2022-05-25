@@ -15,7 +15,7 @@ program
   .version('3.0.0');
 
 program.command('add')
-  .description('Add to SMT key-value pair: key is permalink, value is version')
+  .description('Add to SMT key-value pair: key is permalink of claim, value is version')
   .argument('<name>', 'claim name')
   .argument('<version>', 'claim version, must be 2 or bigger')
   .option('-relay <number>', 'relayId to use')
