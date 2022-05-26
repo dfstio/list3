@@ -39,15 +39,16 @@ List contract is deployed to mumbai network at address 0x91478CfAFbD29F4c89CD2e4
 https://mumbai.polygonscan.com/address/0x91478CfAFbD29F4c89CD2e4e89506AFFb89651df  
 Implementation contracts are deployed to:  
 v1:  0x6e706fac3d10c6bd7dbe86eaf5d6e65ed31d3224
+v2:  0xecc438f80adc0bfeeea580f8dcbda00247884c08 - added seal function and Seal event
 
-ListHash deployed to Goerli: 0x68DB2cf0E076E3DDBdb66179760Da4a9BB232d33  
-https://goerli.etherscan.io/address/0x68DB2cf0E076E3DDBdb66179760Da4a9BB232d33  
+ListHash deployed to Goerli: 0xB24f820BaA49697D5af186955b4b4671E68Ce8F1  
+https://goerli.etherscan.io/address/0xB24f820BaA49697D5af186955b4b4671E68Ce8F1  
 
 Verifier deployed to Goerli: 0xd58bf69DaBcAEfe8D1EAd6327190ff215F5b0c3f  
 https://goerli.etherscan.io/address/0xd58bf69DaBcAEfe8D1EAd6327190ff215F5b0c3f 
 
-Score example contract deployed to Goerli: 0xA21f65304d2Ab87ccd7565Fb9cA2d984aD767646  
-https://goerli.etherscan.io/address/0xA21f65304d2Ab87ccd7565Fb9cA2d984aD767646 
+Score example contract deployed to Goerli: 0xbAA0D0Df5046081aa6d80Fa77E6113BE1cc7be11  
+https://goerli.etherscan.io/address/0xbAA0D0Df5046081aa6d80Fa77E6113BE1cc7be11 
 
 
 VerifierAdd contract is deployed to mumbai network at address 0x613c90582B1668cA6BD31A42803c9e37596a836B  
@@ -83,6 +84,7 @@ Commands:
   ethereum                               Verify Version and Roothash Mumbai events on Ethereum Goerli
   verify [options] <permalink>           Verify ZK proof of inclusion or exclusion on Goerli
   score [options] <permalink> <version>  Example: Add score with transaction on Goerli with ZK proof of inclusion or exclusion
+  seal [options] <permalink>             Example 2: Add score with transaction on Goerli with fresh seal on Mumbai
   snarkverify                            Verify proof in ./proof folder by executing snarkjs
   help [command]                         display help for command
 ```
@@ -170,6 +172,22 @@ Options:
   -relay <number>  relayId to use
   -h, --help       display help for command
 ```  
+
+### seal
+Test transaction on Goerli   
+```
+Usage: list seal [options] <permalink>
+
+Example 2: Add score with transaction on Goerli with fresh seal on Mumbai
+
+Arguments:
+  permalink           claim permalink
+
+Options:
+  -validity <number>  validity of seal in hours, default is 1 hour
+  -h, --help          display help for command
+```  
+
 ### verify
 Verify ZK proof of inclusion or exclusion on Goerli   
 ```

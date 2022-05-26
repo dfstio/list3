@@ -93,6 +93,37 @@
     "inputs": [
       {
         "indexed": true,
+        "internalType": "uint256",
+        "name": "permalink",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint128",
+        "name": "version",
+        "type": "uint128"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint128",
+        "name": "relayId",
+        "type": "uint128"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "roothash",
+        "type": "uint256"
+      }
+    ],
+    "name": "Seal",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
         "internalType": "uint128",
         "name": "relayId",
         "type": "uint128"
@@ -644,6 +675,19 @@
       }
     ],
     "name": "revoke",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "permalink",
+        "type": "uint256"
+      }
+    ],
+    "name": "seal",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

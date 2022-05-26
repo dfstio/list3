@@ -36,7 +36,7 @@ contract ListHash {
     // keccak256(MessageSent(bytes))
     bytes32 public constant VERSION_EVENT_SIG  = 0x40779ce7063d5f55ba195a4101faa644098b5c4e985b7d57f5f326e4f6e2af84;
     bytes32 public constant ROOTHASH_EVENT_SIG = 0xf467dc3352c24e3163f55b7f0140fcc06603b14efe5ea1997d0b32da739f4101;
-
+	bytes32 public constant SEAL_EVENT_SIG =     0xa3a00acaf8b829065e0770f39bf5ac70dd76bec281c2ec75f3789ca4ae9500ca;
 
     // root chain manager
     ICheckpointManager public checkpointManager;
@@ -128,6 +128,22 @@ contract ListHash {
     		(ExitPayloadReader.Log memory log, uint256 _timestamp) = _validateAndExtractMessage(proof);
     		ExitPayloadReader.LogTopics memory topics = log.getTopics();
     		require(bytes32(topics.getField(0).toUint()) == VERSION_EVENT_SIG, // topic0 is event sig
+            		"FxRootTunnel: INVALID_SIGNATURE");
+
+			roothash = topics.getField(3).toUint();		
+			permalink = topics.getField(1).toUint();   
+			version = abi.decode(log.getData(), (uint128));
+			relayId = uint128(topics.getField(2).toUint());
+			
+			return (roothash, _timestamp, permalink, version, relayId);		
+    }
+    
+    function getSeal(bytes memory proof) 
+    		public view returns ( uint256 roothash, uint256 timestamp, uint256 permalink, uint128 version, uint128 relayId) {
+    		
+    		(ExitPayloadReader.Log memory log, uint256 _timestamp) = _validateAndExtractMessage(proof);
+    		ExitPayloadReader.LogTopics memory topics = log.getTopics();
+    		require(bytes32(topics.getField(0).toUint()) == SEAL_EVENT_SIG, // topic0 is event sig
             		"FxRootTunnel: INVALID_SIGNATURE");
 
 			roothash = topics.getField(3).toUint();		

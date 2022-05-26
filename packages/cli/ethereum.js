@@ -125,8 +125,53 @@ async function getProof(relayId)
 	return proof;
 };
 
+async function getSeal(permalink)
+{
+	 let proof = 0;
+	 const posClient = new POSClient();
+	 await posClient.init(
+	 {
+	  log: false,
+      network: "testnet",
+      version: "mumbai",
+      parent: {
+		  provider: new ethers.Wallet(KEY_OWNER, ethereumprovider),
+		  defaultConfig: {
+			from : address
+		  }
+	  },
+	  child: {
+		   provider: new ethers.Wallet(KEY_OWNER, maticprovider),
+		   defaultConfig: {
+			 from : address
+		   }
+	  }
+    });
+    
+    const SEAL_EVENT_SIG = "0xa3a00acaf8b829065e0770f39bf5ac70dd76bec281c2ec75f3789ca4ae9500ca";
+    let events = await list.queryFilter('Seal');
+    console.log("Found ", events.length, "Seal events");
+    
+    let i = events.length - 1;
+    while( i >= 0)
+    {    
+		 const txHash = events[i].transactionHash;
+		 const isReady = await posClient.isCheckPointed(txHash);
+		 console.log("Event ", i, " isCheckPointed: ", isReady, "permalink", events[i].args.permalink.toString());
+		 if( isReady && (events[i].args.permalink == permalink))
+		 {
+			 proof = await posClient.exitUtil.buildPayloadForExit(txHash, SEAL_EVENT_SIG)
+			 console.log("proof:");
+			 console.log( proof );    
+			 break;		
+		 } else i--; 
+	};
+	
+	return proof;
+};
 
 module.exports = {
 	checkEthereum,
-	getProof
+	getProof,
+	getSeal
 }

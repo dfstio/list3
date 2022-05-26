@@ -83,6 +83,24 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "bytes",
+        "name": "proof",
+        "type": "bytes"
+      },
+      {
+        "internalType": "uint256",
+        "name": "maxSealValidityInHours",
+        "type": "uint256"
+      }
+    ],
+    "name": "addScoreSeal",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "listhash",
     "outputs": [

@@ -1,6 +1,6 @@
 pragma solidity 0.8.9;
 //SPDX-License-Identifier: MIT
-// Version 3.00
+// Version 3.20
 
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -92,6 +92,7 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 		event Version(uint256 indexed permalink, uint128 version, uint128 indexed relayId, uint256 indexed roothash); // new version recorded
 		event Roothash(uint256 indexed roothash, uint128 indexed relayId); // Relay's roothash changed
 		event Transfer(uint256 indexed permalink, uint128 indexed fromRelayId, uint128 indexed toRelayId);
+		event Seal(uint256 indexed permalink, uint128 version, uint128 indexed relayId, uint256 indexed roothash); // version is sealed
 
 		event RelayAdded(address indexed relayAddress, uint128 indexed relayId); // Added new relay
 		event RelayConfig(uint128 indexed relayId, string ipfsHash); 
@@ -132,7 +133,7 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 		 function getContractVersion() public pure
 			 returns (uint64)
 		 {
-				 return 300; // 300 = version 3.00
+				 return 320; // 320 = version 3.20
 		 }
    
 		 function addRelay(address to)
@@ -358,6 +359,13 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 			  require(roothash == relays[relayId].roothash, "LIST18 wrong roothash");
 			  relays[relayId].timestamp = block.timestamp;
 			  emit Roothash( roothash, relayId);
+		 }
+
+		 function seal(uint256 permalink) 
+			 external whenNotPaused 
+		 { 
+			  uint128 relayId = versions[permalink].relayId;
+			  emit Seal(permalink, versions[permalink].version, relayId, relays[relayId].roothash); 
 		 }
 
 		 function getVersion(uint256 permalink)

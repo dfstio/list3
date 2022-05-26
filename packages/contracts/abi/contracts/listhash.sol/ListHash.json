@@ -30,6 +30,19 @@
   },
   {
     "inputs": [],
+    "name": "SEAL_EVENT_SIG",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "VERSION_EVENT_SIG",
     "outputs": [
       {
@@ -86,6 +99,45 @@
         "internalType": "uint256",
         "name": "timestamp",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint128",
+        "name": "relayId",
+        "type": "uint128"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes",
+        "name": "proof",
+        "type": "bytes"
+      }
+    ],
+    "name": "getSeal",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "roothash",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "permalink",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint128",
+        "name": "version",
+        "type": "uint128"
       },
       {
         "internalType": "uint128",

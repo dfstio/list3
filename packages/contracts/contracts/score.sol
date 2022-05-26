@@ -17,6 +17,11 @@ interface IListHash {
    	 function getVersion(bytes memory proof) 
     		external view returns ( uint256 roothash, uint256 timestamp, 
     							  uint256 permalink, uint128 version, uint128 relayId);
+    							  
+     function getSeal(bytes memory proof) 
+    		external view returns ( uint256 roothash, uint256 timestamp, 
+    							  uint256 permalink, uint128 version, uint128 relayId);
+
 }
 
 
@@ -57,4 +62,17 @@ contract Score
     	 score[permalink]++;
     	 emit ScoreIncreased( permalink, score[permalink]);
 	}
+	
+	function addScoreSeal(bytes memory proof,		  // proof of seal,
+						  uint256 maxSealValidityInHours) // seal must be less then maxProofAgeInHours hours old
+							external
+	{
+		 (, uint256 timestamp, uint256 permalink, uint128 version,) = listhash.getSeal(proof);
+    	 require( version != 1, "S7 claim is revoked");
+    	 require( block.timestamp < (timestamp + maxSealValidityInHours * 1 hours), "S8 seal is too old");
+    	 
+    	 score[permalink]++;
+    	 emit ScoreIncreased( permalink, score[permalink]);
+	}
+
 }

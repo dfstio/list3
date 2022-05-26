@@ -4,7 +4,7 @@ const { Command } = require('commander');
 const program = new Command();
 const { add, update, revoke, verify } = require("./list");
 const { claim } = require("./claim");
-const { score } = require("./score");
+const { score, seal } = require("./score");
 const { checkEthereum } = require("./ethereum");
 
 const util = require('util')
@@ -81,9 +81,21 @@ program.command('score')
   .option('-relay <number>', 'relayId to use')
   .action(async (permalink, version, options) => {
   	const relayId = options.Relay? options.Relay : 1 ;
-    console.log('Adding score of ', permalink, "version", version, "SMT relay", relayId);
+    console.log('Adding score to ', permalink, "version", version, "SMT relay", relayId);
     await score(permalink, version, relayId);
   });    
+  
+program.command('seal')
+  .description('Example 2: Add score with transaction on Goerli with fresh seal on Mumbai')
+  .argument('<permalink>', 'claim permalink')
+  .option('-validity <number>', 'validity of seal in hours, default is 1 hour')
+  .action(async (permalink, options) => {
+    const validity = options.Validity? options.Validity : 1 ;
+    console.log('Adding score to ', permalink, "with seal validity", validity, "hours");
+    await seal(permalink, validity);
+  });    
+  
+   
   
 program.command('snarkverify')
   .description('Verify proof in ./proof folder by executing snarkjs')
