@@ -45,7 +45,7 @@ async function gettree(relayId)
 			else await tree.insert(key, value);
 	 	}
 	 }
-	
+	//console.log("tree", tree.db.nodes);
 	return {tree, list};
 
 }
