@@ -130,7 +130,7 @@ async function getProof(relayId)
 async function proofAPI(txHash, signature)
 {
   const data = {"txHash": txHash, "signature": signature }; 
-  const url = `https://apis.matic.network/api/v1/matic/exit-payload/${txHash.toString()}?eventSignature=${signature.toString()}`;
+  const url = `https://apis.matic.network/api/v1/mumbai/exit-payload/${txHash.toString()}?eventSignature=${signature.toString()}`;
   console.log("proof api: ", data, url);
   const response = await axios.get(url);
   return response;
@@ -173,11 +173,23 @@ async function getSeal(permalink)
 		 console.log("Event ", i, " isCheckPointed: ", isReady, "permalink", events[i].args.permalink.toString());
 		 if( isReady && (events[i].args.permalink == permalink))
 		 {
-		 	 const start = Date.now();
-			 proof = await posClient.exitUtil.buildPayloadForExit(txHash, SEAL_EVENT_SIG);
-			 const end = Date.now();
-			 console.log("proof generated in", (end-start)/1000, "sec:");
-			 console.log( proof );    
+		 	 const start1 = Date.now();
+			 const proof1 = await proofAPI(txHash, SEAL_EVENT_SIG);
+			 const end1 = Date.now();
+			 proof = proof1.data.result;
+			 console.log("proof from api: ");
+			 console.log(proof);
+			 
+
+//		 	 const start2 = Date.now();
+//			 proof = await posClient.exitUtil.buildPayloadForExit(txHash, SEAL_EVENT_SIG);
+//			 const end2 = Date.now();
+//			 console.log("proof from posClient:");
+//			 console.log( proof );    
+			 console.log("Time api", (end1-start1)/1000, "sec");
+//			 console.log("Time posClient", (end2-start2)/1000);
+//			 if( proof1.data.result.toString() == proof) console.log("Proofs are the same");
+//			 else console.log("Proofs are different");
 			 break;		
 		 } else i--; 
 	};
