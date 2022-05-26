@@ -2,7 +2,8 @@ const {RPC_GOERLI, RPC_MUMBAI, KEY_OWNER, LISTHASH_CONTRACT_ADDRESS, LIST_CONTRA
 const ListHashJSON = require("@list/contracts/abi/contracts/listhash.sol/ListHash.json");
 const ListJSON = require("@list/contracts/abi/contracts/list.sol/List.json");
 const ethers = require("ethers");
-const {POSClient, use} = require("@maticnetwork/maticjs");
+const axios = require('axios');
+const {POSClient, setProofApi, use} = require("@maticnetwork/maticjs");
 const { Web3ClientPlugin } = require("@maticnetwork/maticjs-ethers");
 use(Web3ClientPlugin);
 
@@ -13,7 +14,6 @@ const maticprovider = new ethers.providers.JsonRpcProvider(RPC_MUMBAI);
 const ethereumprovider = new ethers.providers.JsonRpcProvider(RPC_GOERLI);
 const listhash = new ethers.Contract(LISTHASH_CONTRACT_ADDRESS, ListHashJSON, ethereumprovider);
 const list = new ethers.Contract(LIST_CONTRACT_ADDRESS, ListJSON, maticprovider);
-
 
 
 
@@ -85,6 +85,7 @@ async function checkEthereum()
 async function getProof(relayId)
 {
 	 let proof = 0;
+	 await setProofApi("https://apis.matic.network/");
 	 const posClient = new POSClient();
 	 await posClient.init(
 	 {
@@ -125,9 +126,21 @@ async function getProof(relayId)
 	return proof;
 };
 
+
+async function proofAPI(txHash, signature)
+{
+  const data = {"txHash": txHash, "signature": signature }; 
+  const url = `https://apis.matic.network/api/v1/matic/exit-payload/${txHash.toString()}?eventSignature=${signature.toString()}`;
+  console.log("proof api: ", data, url);
+  const response = await axios.get(url);
+  return response;
+};
+
 async function getSeal(permalink)
 {
 	 let proof = 0;
+	 await setProofApi("https://apis.matic.network/");
+
 	 const posClient = new POSClient();
 	 await posClient.init(
 	 {
@@ -160,13 +173,15 @@ async function getSeal(permalink)
 		 console.log("Event ", i, " isCheckPointed: ", isReady, "permalink", events[i].args.permalink.toString());
 		 if( isReady && (events[i].args.permalink == permalink))
 		 {
-			 proof = await posClient.exitUtil.buildPayloadForExit(txHash, SEAL_EVENT_SIG)
-			 console.log("proof:");
+		 	 const start = Date.now();
+			 proof = await posClient.exitUtil.buildPayloadForExit(txHash, SEAL_EVENT_SIG);
+			 const end = Date.now();
+			 console.log("proof generated in", (end-start)/1000, "sec:");
 			 console.log( proof );    
 			 break;		
 		 } else i--; 
 	};
-	
+
 	return proof;
 };
 
@@ -175,3 +190,4 @@ module.exports = {
 	getProof,
 	getSeal
 }
+
