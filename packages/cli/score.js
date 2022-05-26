@@ -32,6 +32,8 @@ async function score(permalink, version, relayId)
 	console.log("TX sent: ", tx.hash);
 	const receipt = await tx.wait(1);
 	console.log('Transaction receipt', receipt);
+	console.log("Waiting for 2 confirmations...");
+	await tx.wait(2);
 	const newScore = await Score.score(permalink);
 	console.log("New score is", newScore.toString());
 }

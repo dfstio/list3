@@ -113,7 +113,7 @@ async function getProof(relayId)
     {    
 		 const txHash = events[i].transactionHash;
 		 const isReady = await posClient.isCheckPointed(txHash);
-		 console.log("Event ", i, " isCheckPointed: ", isReady, "relayId", events[i].args.relayId);
+		 console.log("Event ", i, " isCheckPointed: ", isReady, "relayId", events[i].args.relayId.toString());
 		 if( isReady && (events[i].args.relayId == relayId))
 		 {
 			 proof = await posClient.exitUtil.buildPayloadForExit(txHash, "0x40779ce7063d5f55ba195a4101faa644098b5c4e985b7d57f5f326e4f6e2af84")
