@@ -40,6 +40,7 @@ https://mumbai.polygonscan.com/address/0x91478CfAFbD29F4c89CD2e4e89506AFFb89651d
 Implementation contracts are deployed to:  
 v1:  0x6e706fac3d10c6bd7dbe86eaf5d6e65ed31d3224
 v2:  0xecc438f80adc0bfeeea580f8dcbda00247884c08 - added seal function and Seal event
+v3:  0x04746cf4b7857db865fe84678944e87dd6f9b6eb - added blockHash function
 
 ListHash deployed to Goerli: 0xB24f820BaA49697D5af186955b4b4671E68Ce8F1  
 https://goerli.etherscan.io/address/0xB24f820BaA49697D5af186955b4b4671E68Ce8F1  

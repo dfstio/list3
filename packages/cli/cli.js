@@ -5,7 +5,7 @@ const program = new Command();
 const { add, update, revoke, verify } = require("./list");
 const { claim } = require("./claim");
 const { score, seal } = require("./score");
-const { checkEthereum } = require("./ethereum");
+const { checkEthereum, ethproof } = require("./ethereum");
 
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
@@ -95,7 +95,16 @@ program.command('seal')
     await seal(permalink, validity);
   });    
   
-   
+program.command('ethproof')
+  .description('Example 3: Add score with transaction on Goerli with fresh seal on Mumbai')
+  .argument('<permalink>', 'claim permalink')
+  .option('-validity <number>', 'validity of seal in hours, default is 1 hour')
+  .action(async (permalink, options) => {
+    const validity = options.Validity? options.Validity : 1 ;
+    console.log('Adding score to ', permalink, "with seal validity", validity, "hours");
+    await ethproof(permalink, validity);
+  });    
+     
   
 program.command('snarkverify')
   .description('Verify proof in ./proof folder by executing snarkjs')

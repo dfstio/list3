@@ -2,6 +2,8 @@ const {RPC_GOERLI, RPC_MUMBAI, KEY_OWNER, LISTHASH_CONTRACT_ADDRESS, LIST_CONTRA
 const ListHashJSON = require("@list/contracts/abi/contracts/listhash.sol/ListHash.json");
 const ListJSON = require("@list/contracts/abi/contracts/list.sol/List.json");
 const ethers = require("ethers");
+const { keccak256 } = require("ethereum-cryptography/keccak");
+const { hexToBytes, toHex } = require("ethereum-cryptography/utils");
 const axios = require('axios');
 const {POSClient, setProofApi, use} = require("@maticnetwork/maticjs");
 const { Web3ClientPlugin } = require("@maticnetwork/maticjs-ethers");
@@ -197,9 +199,40 @@ async function getSeal(permalink)
 	return proof;
 };
 
+async function ethproof(permalink, validity)
+{	
+	
+	let permalinkHex = BigInt(permalink).toString(16);
+	//console.log("ethproof: ", permalink, permalinkHex, permalinkHex.length);
+	while( permalinkHex.length < 64) permalinkHex = "0" + permalinkHex;
+	
+	// position of map versions is 0x97
+	const key = "0x" + toHex(keccak256(hexToBytes(permalinkHex +
+								 "0000000000000000000000000000000000000000000000000000000000000097"))).toString();
+   
+	const data = {"jsonrpc":"2.0",
+				  "method":"eth_getProof",
+				  "params":[
+						LIST_CONTRACT_ADDRESS,
+						[key],
+						"latest"],
+				  "id":1 };
+		  
+	//console.log("ethproof: ", data, key);
+	const response = await axios.post(RPC_MUMBAI, data);
+	let value = response.data.result.storageProof[0].value.slice(2).toString();
+	console.log("value: ", value);
+	while( value.length < 64) value = "0" + value;
+	const version = { relayId: "0x" + value.slice(0,32), version: "0x" + value.slice(32)}
+	console.log("version: ", version);
+	console.log("proof: ", response.data.result.storageProof[0]);
+	return;
+};
+
 module.exports = {
 	checkEthereum,
 	getProof,
-	getSeal
+	getSeal,
+	ethproof
 }
 

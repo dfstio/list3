@@ -93,7 +93,8 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 		event Roothash(uint256 indexed roothash, uint128 indexed relayId); // Relay's roothash changed
 		event Transfer(uint256 indexed permalink, uint128 indexed fromRelayId, uint128 indexed toRelayId);
 		event Seal(uint256 indexed permalink, uint128 version, uint128 indexed relayId, uint256 indexed roothash); // version is sealed
-
+		event Blockhash(uint256 blocknumber, bytes32 blockhash);
+		
 		event RelayAdded(address indexed relayAddress, uint128 indexed relayId); // Added new relay
 		event RelayConfig(uint128 indexed relayId, string ipfsHash); 
 		event ShutdownRelay(uint128 indexed relayId);
@@ -366,6 +367,12 @@ contract List is Initializable, OwnableUpgradeable, PausableUpgradeable
 		 { 
 			  uint128 relayId = versions[permalink].relayId;
 			  emit Seal(permalink, versions[permalink].version, relayId, relays[relayId].roothash); 
+		 }
+		 
+		 function blockHash() 
+			 external whenNotPaused 
+		 { 
+			  emit Blockhash(block.number-1, blockhash(block.number-1)); 
 		 }
 
 		 function getVersion(uint256 permalink)
