@@ -225,7 +225,8 @@ async function ethproof(permalink, validity)
 	while( value.length < 64) value = "0" + value;
 	const version = { relayId: "0x" + value.slice(0,32), version: "0x" + value.slice(32)}
 	console.log("version: ", version);
-	console.log("proof: ", response.data.result.storageProof[0]);
+	console.log("proof: ", response.data); //.result.storageProof[0]
+	console.log("storageProof: ", response.data.result.storageProof[0]);
 	return;
 };
 

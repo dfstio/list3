@@ -16,6 +16,7 @@ const { snark } = require("./snark");
 const { getPermalink } = require("./claim");
 
 
+
 async function gettree(relayId)
 {
 	 const wallet = new ethers.Wallet(RELAY[relayId]);

@@ -6,6 +6,7 @@ const { add, update, revoke, verify } = require("./list");
 const { claim } = require("./claim");
 const { score, seal } = require("./score");
 const { checkEthereum, ethproof } = require("./ethereum");
+const { sample } = require("./smt");
 
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
@@ -105,6 +106,12 @@ program.command('ethproof')
     await ethproof(permalink, validity);
   });    
      
+program.command('sample')
+  .description('Example: Create several SMT trees and save them to files')
+  .action(async () => {
+    console.log('Creating SMTs...');
+    await sample();
+  });  
   
 program.command('snarkverify')
   .description('Verify proof in ./proof folder by executing snarkjs')
