@@ -32,6 +32,8 @@
     "deployverifier": "hardhat run --network goerli scripts/deployverifier.js",
     "deploylisthash": "hardhat run --network goerli scripts/deploylisthash.js",
     "deployscore": "hardhat run --network goerli scripts/deployscore.js",
+    "deployscoreaws": "hardhat run --network aws scripts/deployscoreaws.js",
+    "scoreaws": "hardhat run --network aws scripts/scoreaws.js",
     "upgradelist": "hardhat run --network mumbai scripts/upgradelist.js",
     "accounts": "hardhat accounts",
     "verifyverifier": "hardhat verify --network goerli 0xd58bf69DaBcAEfe8D1EAd6327190ff215F5b0c3f",

@@ -1,0 +1,21 @@
+{
+  "name": "@list/server",
+  "version": "3.0.0",
+  "description": "List SNARK proof website",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "logs": "heroku logs --tail",
+    "local": "heroku local"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "circom": "^0.5.45",
+    "circomlib": "^0.5.3",
+    "http-server": "^13.0.2",
+    "shelljs": "^0.8.4",
+    "snarkjs": "^0.4.7",
+    "zkey-manager": "^0.0.6"
+  }
+}

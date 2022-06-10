@@ -32,6 +32,9 @@ Faucets:
 https://goerlifaucet.com/  
 https://mumbaifaucet.com/
 
+## SNARKS
+server: https://peaceful-shelf-10025.herokuapp.com/
+
 
 ## Contracts
 
@@ -51,6 +54,7 @@ https://goerli.etherscan.io/address/0xd58bf69DaBcAEfe8D1EAd6327190ff215F5b0c3f
 Score example contract deployed to Goerli: 0xbAA0D0Df5046081aa6d80Fa77E6113BE1cc7be11  
 https://goerli.etherscan.io/address/0xbAA0D0Df5046081aa6d80Fa77E6113BE1cc7be11 
 
+ScoreAWS example contract deployed to AWS: 0x8750A33948C11E21484fb21e9Ff2D0e238e8527f
 
 VerifierAdd contract is deployed to mumbai network at address 0x613c90582B1668cA6BD31A42803c9e37596a836B  
 https://mumbai.polygonscan.com/address/0x613c90582B1668cA6BD31A42803c9e37596a836B  

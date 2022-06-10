@@ -5,6 +5,7 @@ const program = new Command();
 const { add, update, revoke, verify } = require("./list");
 const { claim } = require("./claim");
 const { score, seal } = require("./score");
+const { scoreaws } = require("./scoreaws");
 const { checkEthereum, ethproof } = require("./ethereum");
 const { sample } = require("./smt");
 
@@ -86,6 +87,16 @@ program.command('score')
     await score(permalink, version, relayId);
   });    
   
+  
+program.command('scoreaws')
+  .description('Example: Add score with transaction on AWS')
+  .argument('<permalink>', 'claim permalink')
+  .action(async (permalink) => {
+    console.log('Adding AWS score to ', permalink);
+    await scoreaws(permalink);
+  });  
+  
+    
 program.command('seal')
   .description('Example 2: Add score with transaction on Goerli with fresh seal on Mumbai')
   .argument('<permalink>', 'claim permalink')

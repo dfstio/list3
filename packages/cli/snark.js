@@ -6,7 +6,10 @@ const { save } = require("./save");
 
 async function snark(input, wasm, zkey, vkey) 
 {
+	const start1 = Date.now();
     const { proof, publicSignals } = await snarkjs.groth16.fullProve(input, wasm, zkey);
+    const end1 = Date.now();
+    console.log("Time generating proof", (end1-start1)/1000, "sec");
 
     console.log("Proof: ");
     console.log(JSON.stringify(proof, null, 1));

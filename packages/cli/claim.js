@@ -1,5 +1,5 @@
 const { DATA_DIR } = require('@list/config');
-const vKeyClaim = require("../circuit/verification_keyclaim.json");
+const vKeyClaim = require("../circuit/keys/verification_keyclaim.json");
 const crypto = require('crypto');
 const fs = require('fs').promises;
 const buildPoseidon = require("circomlibjs").buildPoseidon;
@@ -38,7 +38,7 @@ async function checkHash(privateKey)
 
 	 const result = await snark(input, 
 								"./packages/circuit/claim_js/claim.wasm", 
-								"./packages/circuit/claim_0001.zkey",
+								"./packages/circuit/zkeys/claim_0001.zkey",
 								vKeyClaim);
 	 return result;
 }	 													

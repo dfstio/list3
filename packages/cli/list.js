@@ -2,11 +2,11 @@ const {RPC_MUMBAI, RPC_GOERLI, RELAY, LIST_CONTRACT_ADDRESS,
 		VERIFIER_ADDRESS, PROOF_DIR } = require('@list/config');
 const ListJSON = require("@list/contracts/abi/contracts/list.sol/List.json");
 const VerifierJSON = require("@list/contracts/abi/contracts/verifier.sol/Verifier.json");
-const vKey = require("@list/circuit/verification_key.json");
-const vKeyAdd = require("@list/circuit/verification_keyadd.json");
-const vKeyUpdate = require("@list/circuit/verification_keyupdate.json");
-const vKeyRevoke = require("@list/circuit/verification_keyrevoke.json");
-const vKeyAddRevoked = require("@list/circuit/verification_keyaddrevoked.json");
+const vKey = require("@list/circuit/keys/verification_key.json");
+const vKeyAdd = require("@list/circuit/keys/verification_keyadd.json");
+const vKeyUpdate = require("@list/circuit/keys/verification_keyupdate.json");
+const vKeyRevoke = require("@list/circuit/keys/verification_keyrevoke.json");
+const vKeyAddRevoked = require("@list/circuit/keys/verification_keyaddrevoked.json");
 const ethers = require("ethers");
 const newMemEmptyTrie = require("circomlibjs").newMemEmptyTrie;
 const provider = new ethers.providers.StaticJsonRpcProvider(RPC_MUMBAI);
@@ -65,7 +65,7 @@ async function add(name, version, relayId)
 	 
 	 const result = await snark(input, 
 								"./packages/circuit/smtadd_js/smtadd.wasm", 
-								"./packages/circuit/smtadd_0001.zkey",
+								"./packages/circuit/zkeys/smtadd_0001.zkey",
 								vKeyAdd);
 	 													
 	 if( result.isVerificationOK &&  (tree.F.toObject(tree.root).toString() == result.publicSignals[0]))
@@ -110,7 +110,7 @@ async function update(name, version, relayId)
 	 
 	 const result = await snark(input, 
 								"./packages/circuit/smtupdate_js/smtupdate.wasm", 
-								"./packages/circuit/smtupdate_0001.zkey",
+								"./packages/circuit/zkeys/smtupdate_0001.zkey",
 								vKeyUpdate);
 	 													
 	 if( result.isVerificationOK &&  (tree.F.toObject(tree.root).toString() == result.publicSignals[0]))
@@ -173,7 +173,7 @@ async function revoke(name, relayId)
 	 
 	 const result = await snark(input, 
 								"./packages/circuit/smtrevoke_js/smtrevoke.wasm", 
-								"./packages/circuit/smtrevoke_0001.zkey",
+								"./packages/circuit/zkeys/smtrevoke_0001.zkey",
 								vKeyRevoke);
 	 													
 	 if( result.isVerificationOK &&  (tree.F.toObject(tree.root).toString() == result.publicSignals[0]))
@@ -213,7 +213,7 @@ async function addrevoked(tree, list, claim, permalink, name, relayId)
 	 
 	 const result = await snark(input, 
 								"./packages/circuit/smtaddrevoked_js/smtaddrevoked.wasm", 
-								"./packages/circuit/smtaddrevoked_0001.zkey",
+								"./packages/circuit/zkeys/smtaddrevoked_0001.zkey",
 								vKeyAddRevoked);
 	 													
 	 if( result.isVerificationOK &&  (tree.F.toObject(tree.root).toString() == result.publicSignals[0]))
@@ -254,7 +254,7 @@ async function verify(permalink, relayId)
 	 
 	 const result = await snark(input, 
 								"./packages/circuit/smt_js/smt.wasm", 
-								"./packages/circuit/smt_0001.zkey",
+								"./packages/circuit/zkeys/smt_0001.zkey",
 								vKey);
 	 													
 	 if( result.isVerificationOK && (tree.F.toObject(tree.root).toString() == result.publicSignals[0]))
@@ -282,7 +282,7 @@ async function verifierProof(permalink, relayId)
 	 
 	 const result = await snark(input, 
 								"./packages/circuit/smt_js/smt.wasm", 
-								"./packages/circuit/smt_0001.zkey",
+								"./packages/circuit/zkeys/smt_0001.zkey",
 								vKey);
 	 return result;												
 };

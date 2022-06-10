@@ -9,9 +9,9 @@ require('hardhat-abi-exporter');
 
 
 
-const defaultNetwork = "mumbai"; // "localhost";  "mumbai";
+const defaultNetwork = "aws"; // "localhost";  "mumbai";
 const { isAddress, getAddress, formatUnits, parseUnits } = utils;
-const {KEY_OWNER, RPC_RINKEBY, RPC_GOERLI, RPC_MUMBAI, KEY_ETHERSCAN, KEY_MUMBAI } = require('@list/config');
+const {KEY_OWNER, RPC_RINKEBY, RPC_GOERLI, RPC_MUMBAI, RPC_AWS, CHAINID_AWS, KEY_ETHERSCAN, KEY_MUMBAI } = require('@list/config');
 const  privateKey  = KEY_OWNER;
 //const { privateKey } = require('./private_deployer.json');
 
@@ -93,6 +93,14 @@ module.exports = {
     mumbai: {
       url: RPC_MUMBAI,
       chainId: 80001, 
+      gas:"auto",
+      gasMultiplier:2,
+      forwarder:  0x4d4581c01A457925410cd3877d17b2fd4553b2C5,
+      accounts: [privateKey]
+    },
+     aws: {
+      url: RPC_AWS,
+      chainId: CHAINID_AWS, 
       gas:"auto",
       gasMultiplier:2,
       forwarder:  0x4d4581c01A457925410cd3877d17b2fd4553b2C5,

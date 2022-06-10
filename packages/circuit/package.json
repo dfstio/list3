@@ -16,12 +16,16 @@
 	  "ceremony3": "snarkjs powersoftau prepare phase2 pot18_0001.ptau pot18_final.ptau -v",
 	  "ceremony4": "snarkjs groth16 setup smt.r1cs pot14_final.ptau smt_0000.zkey",
 	  "ceremony5": "snarkjs zkey contribute smt_0000.zkey smt_0001.zkey --name=SecondContribution -v",
-	  "ceremony6": "snarkjs zkey export verificationkey smt_0001.zkey verification_key.json",
+	  "ceremony6": "snarkjs zkey export verificationkey psmt.zkey pverification_key.json",
 	  "solidity": "snarkjs zkey export solidityverifier smt_0001.zkey verifier.sol",
 	  "generatecall": "snarkjs zkesc public.json proof.json",
-	  "plonk1": "snarkjs plonk setup smtrevoke.r1cs pot14_final.ptau psmt_0000.zkey",
-	  "witness": "node ./smtadd_js/generate_witness.js ./smtadd_js/smtadd.wasm ../../data/add-input.json witness.wtns",
-	  "proof": "snarkjs g16p smtadd_0001.zkey witness.wtns proof.json public.json",
-	  "verify": "snarkjs g16v verification_keyadd.json public.json proof.json"    
+	  "plonk": "snarkjs plonk setup smt.r1cs pot18_final.ptau psmt.zkey",
+	  "plonksolidity": "snarkjs zkey export solidityverifier psmt.zkey pverifier.sol",
+	  "witness": "node ./smt_js/generate_witness.js ./smt_js/smt.wasm ../../proof/input.json ../../proof/witness.wtns",
+	  "proof": "snarkjs g16p smt_0001.zkey ../../proof/witness.wtns ../../proof/proof.json ../../proof/public.json",
+	  "pproof": "snarkjs plonk prove psmt.zkey ../../proof/witness.wtns  ../../proof/proof.json ../../proof/public.json",
+	  "pprooffull": "snarkjs plonk fullprove ../../proof/input.json ./smt_js/smt.wasm psmt.zkey ../../proof/proof.json ../../proof/public.json",
+	  "verify": "snarkjs g16v verification_key.json ../../proof/public.json ../../proof/proof.json",
+	  "pverify": "snarkjs plonk verify pverification_key.json ../../proof/public.json ../../proof/proof.json"     
   }
 }
