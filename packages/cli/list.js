@@ -4,6 +4,7 @@ const ListJSON = require("@list/contracts/abi/contracts/list.sol/List.json");
 const VerifierJSON = require("@list/contracts/abi/contracts/verifier.sol/Verifier.json");
 const vKey = require("@list/circuit/keys/verification_key.json");
 const vKeyAdd = require("@list/circuit/keys/verification_keyadd.json");
+const vKeyAddM = require("@list/circuit/keys/verification_keyaddm.json");
 const vKeyUpdate = require("@list/circuit/keys/verification_keyupdate.json");
 const vKeyRevoke = require("@list/circuit/keys/verification_keyrevoke.json");
 const vKeyAddRevoked = require("@list/circuit/keys/verification_keyaddrevoked.json");
@@ -67,6 +68,53 @@ async function add(name, version, relayId)
 								"./packages/circuit/smtadd_js/smtadd.wasm", 
 								"./packages/circuit/zkeys/smtadd_0001.zkey",
 								vKeyAdd);
+	 													
+	 if( result.isVerificationOK &&  (tree.F.toObject(tree.root).toString() == result.publicSignals[0]))
+	 {
+	 	console.log("New root", tree.F.toObject(tree.root).toString());
+	 	console.log("Adding claim version to blockchain...");
+	 	const proof = result.proof;
+	 	const cproof = claim.proof;
+	 	const tx = await list.add(
+	 		[proof.pi_a[0], proof.pi_a[1]],
+	 		[[proof.pi_b[0][1],proof.pi_b[0][0]],[proof.pi_b[1][1],proof.pi_b[1][0]]],
+	 		[proof.pi_c[0],proof.pi_c[1]],
+	 		result.publicSignals,
+	 		[cproof.pi_a[0], cproof.pi_a[1]],
+	 		[[cproof.pi_b[0][1],cproof.pi_b[0][0]],[cproof.pi_b[1][1],cproof.pi_b[1][0]]],
+	 		[cproof.pi_c[0],cproof.pi_c[1]],
+	 		claim.publicSignals
+	 	);
+	 
+		console.log("TX sent: ", tx.hash);
+		const receipt = await tx.wait(1);
+		console.log('Transaction receipt', receipt);
+		
+		const relayData = await list.relays(relayId);
+		const newRoot = relayData.roothash;
+		if( newRoot.toString() == tree.F.toObject(tree.root).toString()) 
+			console.log('New roothash on blockchain is correct: ', newRoot.toString());
+		else
+			console.error('New roothash on blockchain is WRONG:', newRoot.toString());
+	 }
+};
+
+
+async function madd(name, version, relayId)
+{
+	 
+	 let {tree, list} = await gettree(relayId); 	
+	 console.log("Old root", tree.F.toObject(tree.root).toString());
+	 
+	 const claim = await getPermalink(name); 
+	 console.log("getPermalink", claim);
+	 const permalink = claim.publicSignals[0]; // out signal of claim circuit 
+	 const input = await generateAddMInput(tree, permalink, version);
+	 
+	 const result = await snark(input, 
+								"./packages/circuit/msmtadd_js/msmtadd.wasm", 
+								"./packages/circuit/zkeys/msmtadd.zkey",
+								vKeyAddM);
 	 													
 	 if( result.isVerificationOK &&  (tree.F.toObject(tree.root).toString() == result.publicSignals[0]))
 	 {
@@ -315,6 +363,35 @@ async function generateAddInput(tree, _key, _value)
 	return input;
 }
 
+async function generateAddMInput(tree, _key, _value) 
+{
+    const key = tree.F.e(_key);
+    const check = await tree.find(key);
+    if( check.found ) { console.error("Cannot add key %d as it is already exist", _key); return; }
+    
+    const value = tree.F.e(_value)
+    
+    const res = await tree.insert(key,value);
+    let siblings = res.siblings;
+    for (let i=0; i<siblings.length; i++) siblings[i] = tree.F.toObject(siblings[i]);
+    while (siblings.length<10) siblings.push(0);
+
+    const input = {
+        oldRoot: tree.F.toObject(res.oldRoot),
+        siblings: siblings,
+        oldKey: res.isOld0 ? 0 : tree.F.toObject(res.oldKey),
+        oldValue: res.isOld0 ? 0 : tree.F.toObject(res.oldValue),
+        isOld0: res.isOld0 ? 1 : 0,
+        newKey: tree.F.toObject(key),
+        newValue: tree.F.toObject(value)
+    };
+    
+    console.log("Input: ");
+    console.log( JSON.stringify(input, (_, v) => typeof v === 'bigint' ? v.toString() : v, 1));
+	return input;
+}
+
+
 async function generateUpdateInput(tree, _key, _value) 
 {
     const key = tree.F.e(_key);
@@ -438,7 +515,8 @@ async function save(data, name)
 
 
 module.exports = {
-    add,
+    add, 
+    madd,
     update,
     revoke,
     verify,

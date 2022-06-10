@@ -9,23 +9,23 @@
     "circomlib": "^2.0.3"
   },
     "scripts": {
-	  "compile": "circom smt.circom --r1cs --wasm --sym",
+	  "compile": "circom ./circuits/claim.circom --r1cs --wasm --sym",
 	  "archive": "git archive -o cli.zip HEAD",
 	  "ceremony1": "snarkjs powersoftau new bn128 18 pot18_0000.ptau -v",
 	  "ceremony2": "snarkjs powersoftau contribute pot18_0000.ptau pot18_0001.ptau --name=FirstContribution -v",
 	  "ceremony3": "snarkjs powersoftau prepare phase2 pot18_0001.ptau pot18_final.ptau -v",
-	  "ceremony4": "snarkjs groth16 setup smt.r1cs pot14_final.ptau smt_0000.zkey",
-	  "ceremony5": "snarkjs zkey contribute smt_0000.zkey smt_0001.zkey --name=SecondContribution -v",
-	  "ceremony6": "snarkjs zkey export verificationkey psmt.zkey pverification_key.json",
+	  "ceremony4": "snarkjs groth16 setup ./compile/msmtadd.r1cs ./ptau/13.ptau ./zkeys/msmtadd_0000.zkey",
+	  "ceremony5": "snarkjs zkey contribute ./zkeys/msmtadd_0000.zkey ./zkeys/msmtadd.zkey --name=SecondContribution -v",
+	  "ceremony6": "snarkjs zkey export verificationkey ./zkeys/pclaim.zkey ./keys/verification_keypc.json",
 	  "solidity": "snarkjs zkey export solidityverifier smt_0001.zkey verifier.sol",
 	  "generatecall": "snarkjs zkesc public.json proof.json",
-	  "plonk": "snarkjs plonk setup smt.r1cs pot18_final.ptau psmt.zkey",
+	  "plonk": "snarkjs plonk setup ./compile/claim.r1cs ./ptau/12.ptau ./zkeys/pclaim.zkey",
 	  "plonksolidity": "snarkjs zkey export solidityverifier psmt.zkey pverifier.sol",
 	  "witness": "node ./smt_js/generate_witness.js ./smt_js/smt.wasm ../../proof/input.json ../../proof/witness.wtns",
 	  "proof": "snarkjs g16p smt_0001.zkey ../../proof/witness.wtns ../../proof/proof.json ../../proof/public.json",
 	  "pproof": "snarkjs plonk prove psmt.zkey ../../proof/witness.wtns  ../../proof/proof.json ../../proof/public.json",
-	  "pprooffull": "snarkjs plonk fullprove ../../proof/input.json ./smt_js/smt.wasm psmt.zkey ../../proof/proof.json ../../proof/public.json",
+	  "pprooffull": "snarkjs plonk fullprove ../../proof/input.json ./claim_js/claim.wasm ./zkeys/pclaim.zkey ../../proof/proof.json ../../proof/public.json",
 	  "verify": "snarkjs g16v verification_key.json ../../proof/public.json ../../proof/proof.json",
-	  "pverify": "snarkjs plonk verify pverification_key.json ../../proof/public.json ../../proof/proof.json"     
+	  "pverify": "snarkjs plonk verify ./keys/verification_keypc.json ../../proof/public.json ../../proof/proof.json"     
   }
 }

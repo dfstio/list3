@@ -33,7 +33,7 @@ https://goerlifaucet.com/
 https://mumbaifaucet.com/
 
 ## SNARKS
-server: https://peaceful-shelf-10025.herokuapp.com/
+server: https://protected-temple-09609.herokuapp.com/
 
 
 ## Contracts

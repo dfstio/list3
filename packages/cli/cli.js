@@ -2,7 +2,7 @@
 const { PROOF_DIR } = require('@list/config');
 const { Command } = require('commander');
 const program = new Command();
-const { add, update, revoke, verify } = require("./list");
+const { add, madd, update, revoke, verify } = require("./list");
 const { claim } = require("./claim");
 const { score, seal } = require("./score");
 const { scoreaws } = require("./scoreaws");
@@ -26,6 +26,17 @@ program.command('add')
   	const relayId = options.Relay? options.Relay : 1 ;
     console.log('adding {', name, ':' , version, '} pair to SMT relay', relayId);
     await add(name, version, relayId);
+  });
+  
+program.command('madd')
+  .description('Add to mobile SMT key-value pair: key is permalink of claim, value is version')
+  .argument('<name>', 'claim name')
+  .argument('<version>', 'claim version, must be 2 or bigger')
+  .option('-relay <number>', 'relayId to use')
+  .action(async (name, version, options) => {
+  	const relayId = options.Relay? options.Relay : 1 ;
+    console.log('adding {', name, ':' , version, '} pair to SMT relay', relayId);
+    await madd(name, version, relayId);
   });
   
 program.command('update')
