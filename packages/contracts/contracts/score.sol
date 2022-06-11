@@ -2,6 +2,9 @@ pragma solidity 0.8.9;
 //SPDX-License-Identifier: MIT
 // Version 3.00
 
+
+
+
 interface IVerifier {
 
     function verifyProof(
@@ -27,13 +30,16 @@ interface IListHash {
 
 contract Score
 {
+
 	mapping(uint256 => uint256) public score; // permalink => Score
 	
 	event ScoreIncreased(uint256 indexed permalink, uint256 newScore);
+	event Check(string checkType, bool valid);
 	
 
     IVerifier public verifier;
     IListHash public listhash;
+
 
 
     constructor(IVerifier _verifier, IListHash _listhash) {
@@ -74,5 +80,6 @@ contract Score
     	 score[permalink]++;
     	 emit ScoreIncreased( permalink, score[permalink]);
 	}
-
+	
 }
+

@@ -7,7 +7,7 @@ const { claim } = require("./claim");
 const { score, seal } = require("./score");
 const { scoreaws } = require("./scoreaws");
 const { awsproof } = require("./awsproof");
-const { bridge } = require("./bridge");
+const { bridge, getBlock } = require("./bridge");
 const { checkEthereum, ethproof } = require("./ethereum");
 const { sample } = require("./smt");
 
@@ -117,11 +117,20 @@ program.command('bridge')
     await bridge();
   });    
   
+program.command('block')
+  .description('Get block number on Goerli')
+  .action(async () => {
+    console.log('Getting block number on Goerli... ');
+    await getBlock();
+  });    
+    
+  
 program.command('awsproof')
   .description('Checking value on Mumbai and Goerli')
-  .action(async () => {
+  .argument('<permalink>', 'claim permalink')
+  .action(async (permalink) => {
     console.log('Checking value on Mumbai and Goerli... ');
-    await awsproof(80, 102785);
+    await awsproof(permalink);
   });  
     
 program.command('seal')

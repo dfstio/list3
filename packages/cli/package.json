@@ -34,8 +34,10 @@
     "merkle-patricia-tree": "^4.2.4",
     "promisfy": "^1.2.0",
     "promisify": "^0.0.3",
+    "rlp": "^3.0.0",
     "snarkjs": "^0.4.18",
-    "util": "^0.12.4"
+    "util": "^0.12.4",
+    "web3": "^1.7.3"
   },
   "bin": {
     "cli": "./cli.js"

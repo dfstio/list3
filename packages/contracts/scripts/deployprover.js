@@ -5,8 +5,6 @@
 // Runtime Environment's members available in the global scope.
 const hre = require("hardhat");
 
-const { VERIFIER_ADDRESS, LISTHASH_CONTRACT_ADDRESS, PROVER_GOERLI } = require('@list/config');
-
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
   // line interface.
@@ -19,12 +17,12 @@ async function main() {
   const owner = accounts[0].address;
   console.log("Deployer address:", owner);
   // We get the contract to deploy
-  const Verifier = await hre.ethers.getContractFactory("Score");
-  const verifier = await Verifier.deploy(VERIFIER_ADDRESS, LISTHASH_CONTRACT_ADDRESS);
+  const Verifier = await hre.ethers.getContractFactory("MerkleProver");
+  const verifier = await Verifier.deploy();
 
   await verifier.deployed();
 
-  console.log("Score deployed to:", verifier.address);
+  console.log("Prover deployed to:", verifier.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

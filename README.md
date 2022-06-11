@@ -75,6 +75,8 @@ Bridge contracts are deployed to:
 mumbai 0xd11C528609bE52C433Ee1c200a5aE0056b600379 https://mumbai.polygonscan.com/address/0xd11C528609bE52C433Ee1c200a5aE0056b600379#code
 goerli 0x6e706Fac3d10C6Bd7dBe86EaF5d6e65ED31d3224 https://goerli.etherscan.io/address/0x6e706Fac3d10C6Bd7dBe86EaF5d6e65ED31d3224#code
 
+Prover contract is deployed to:
+goerli 0xecc438f80adc0bfEeEA580f8DCbda00247884C08 https://goerli.etherscan.io/address/0xecc438f80adc0bfEeEA580f8DCbda00247884C08#code
 
 ## Usage:
 ```

@@ -33,6 +33,17 @@ async function seal(rpc, contract, block)
 	console.log('Transaction block:', receipt.blockNumber);
 }
 
+async function getBlock()
+{	
+	const provider = new ethers.providers.JsonRpcProvider(RPC_GOERLI);
+	const block = await provider.getBlock("latest");
+	let date = new Date(block.timestamp*1000);
+	console.log("Block:", block.number, date.toUTCString());
+	//console.log(JSON.stringify(block.number, null, 1));
+
+};
+
 module.exports = {
-	bridge
+	bridge,
+	getBlock
 }
