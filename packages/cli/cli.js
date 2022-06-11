@@ -6,6 +6,8 @@ const { add, madd, update, revoke, verify } = require("./list");
 const { claim } = require("./claim");
 const { score, seal } = require("./score");
 const { scoreaws } = require("./scoreaws");
+const { awsproof } = require("./awsproof");
+const { bridge } = require("./bridge");
 const { checkEthereum, ethproof } = require("./ethereum");
 const { sample } = require("./smt");
 
@@ -107,6 +109,20 @@ program.command('scoreaws')
     await scoreaws(permalink);
   });  
   
+
+program.command('bridge')
+  .description('Sealing blocknumber and blockhash on Mumbai and Goerli')
+  .action(async () => {
+    console.log('Sealing blocknumber and blockhash on Mumbai and Goerli... ');
+    await bridge();
+  });    
+  
+program.command('awsproof')
+  .description('Checking value on Mumbai and Goerli')
+  .action(async () => {
+    console.log('Checking value on Mumbai and Goerli... ');
+    await awsproof(80, 102785);
+  });  
     
 program.command('seal')
   .description('Example 2: Add score with transaction on Goerli with fresh seal on Mumbai')

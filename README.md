@@ -71,6 +71,11 @@ https://mumbai.polygonscan.com/address/0x25c593AAeaA06a41881186a8cE174C9AB0ec537
 VerifierPermalink contract is deployed to mumbai network at address 0xb6514E22ef505d8bD1AF6A39cB0FB578c9241515  
 https://mumbai.polygonscan.com/address/0xb6514E22ef505d8bD1AF6A39cB0FB578c9241515  
 
+Bridge contracts are deployed to:
+mumbai 0xd11C528609bE52C433Ee1c200a5aE0056b600379 https://mumbai.polygonscan.com/address/0xd11C528609bE52C433Ee1c200a5aE0056b600379#code
+goerli 0x6e706Fac3d10C6Bd7dBe86EaF5d6e65ED31d3224 https://goerli.etherscan.io/address/0x6e706Fac3d10C6Bd7dBe86EaF5d6e65ED31d3224#code
+
+
 ## Usage:
 ```
 Usage (from list3 folder): list [options] [command]
