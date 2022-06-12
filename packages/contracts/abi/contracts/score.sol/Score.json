@@ -178,7 +178,7 @@
       },
       {
         "internalType": "bytes",
-        "name": "version",
+        "name": "newScore",
         "type": "bytes"
       },
       {

@@ -100,7 +100,7 @@ contract Score
 	}
 	
 	function syncScore( uint256 permalink, 		// permalink
-						bytes calldata version,		// new version
+						bytes calldata newScore,	// new score
 						bytes calldata proof,   // AWS proof,
 						address contractAddress,// AWS Score address
 						uint256 blockhashExpiryMinutes) // hash must be less then blockhashExpiryMinutes minutes old
@@ -108,14 +108,22 @@ contract Score
 	{
     	 //require( version != 1, "S8 claim is revoked");
     	 bytes memory storageKey = bridge.getMapStorageKey(permalink, 0);
-    	 //bytes memory value = abi.encode(version);
+
 		 (bool valid, string memory reason) = 
-		 	bridge.verify(proof, contractAddress, storageKey, version, blockhashExpiryMinutes);
+		 	bridge.verify(proof, contractAddress, storageKey, newScore, blockhashExpiryMinutes);
 		 require( valid, reason);	
     	 
-    	 score[permalink] = 7;
+    	 score[permalink] = bytesToUint(newScore);
     	 emit ScoreIncreased( permalink, score[permalink]);
 	}
 
+	function bytesToUint(bytes memory b) internal pure returns (uint256)
+	{
+        uint256 number;
+        for(uint i=0;i<b.length;i++){
+            number = number + uint(uint8(b[i]))*(2**(8*(b.length-(i+1))));
+        }
+    	return number;
+	}
 	
 }

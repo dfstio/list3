@@ -313,7 +313,7 @@ async function awsproof(permalink)
 	//console.log("block data: ", rpcBlock.data.result);
 	
 	
-	let value = response.data.result.storageProof[0].value.slice(2).toString();
+	let value = response.data.result.storageProof[0].value.toString();
 	console.log("Value from AWS chain: ", value);
 	//console.log("proof: ", response.data.result); //.result.storageProof[0]
 	console.log("storageProof: ", response.data.result.storageProof[0]);
