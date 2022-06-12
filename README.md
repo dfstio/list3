@@ -45,15 +45,15 @@ v1:  0x6e706fac3d10c6bd7dbe86eaf5d6e65ed31d3224
 v2:  0xecc438f80adc0bfeeea580f8dcbda00247884c08 - added seal function and Seal event
 v3:  0x04746cf4b7857db865fe84678944e87dd6f9b6eb - added blockHash function
 
-ListHash deployed to Goerli: 0xB24f820BaA49697D5af186955b4b4671E68Ce8F1  
-https://goerli.etherscan.io/address/0xB24f820BaA49697D5af186955b4b4671E68Ce8F1  
+ListHash deployed to Goerli: 0x554fC59FD09816Cf082e68040b87aB15a94166a1 
+https://goerli.etherscan.io/address/0x554fC59FD09816Cf082e68040b87aB15a94166a1  
 
 Verifier deployed to Goerli: 0xd58bf69DaBcAEfe8D1EAd6327190ff215F5b0c3f  
 https://goerli.etherscan.io/address/0xd58bf69DaBcAEfe8D1EAd6327190ff215F5b0c3f 
 
-Score example contract deployed to Goerli: 0x6145E4c12CEd552C28FEC4753b64C26c53028010  
-https://goerli.etherscan.io/address/0x6145E4c12CEd552C28FEC4753b64C26c53028010 
-https://mumbai.polygonscan.com/address/0x8dD9A8C0a838E0BE1A64FE51348EE1b18AF6bf51#code
+Score example contract deployed to Goerli: 0x1a72dF8C207A0f0B297537270EbaB70b9D8D8CD1  
+https://goerli.etherscan.io/address/0x1a72dF8C207A0f0B297537270EbaB70b9D8D8CD1 
+
 
 ScoreAWS example contract deployed to AWS: 0x8750A33948C11E21484fb21e9Ff2D0e238e8527f
 

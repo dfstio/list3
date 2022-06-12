@@ -24,6 +24,9 @@ interface IListHash {
      function getSeal(bytes memory proof) 
     		external view returns ( uint256 roothash, uint256 timestamp, 
     							  uint256 permalink, uint128 version, uint128 relayId);
+    							  
+     function getBlockhash(bytes memory proof, address fxChildTunnel) 
+    		external view returns ( uint256 blockNumber, uint256 timestamp, bytes32 blockHash );							  
 
 }
 
@@ -35,6 +38,16 @@ interface IBridge {
 						  bytes calldata value,
 						  uint256 blockhashExpiryMinutes) 
 				external view returns (bool valid, string memory reason);
+				
+		function verifyHash( bytes calldata proofData,
+							 address contractAddress,
+							 bytes calldata storageKey,
+							 bytes calldata value,
+							 uint256 blockhashExpiryMinutes,
+							 bytes32 _blockhash,
+							 uint256 _timestamp) 
+				external view returns (bool valid, string memory reason);
+
 
 
 		function getMapStorageKey(uint256 index, uint256 mapPosition) 
@@ -56,7 +69,14 @@ contract Score
     IListHash public listhash;
     IBridge   public bridge;
 
-
+	struct Tunnel
+	{
+		uint256 timestamp;
+		bytes32 hash;
+		bytes storageKey;
+		bool valid;
+		string reason;	
+	}
 
     constructor(IVerifier _verifier, IListHash _listhash, IBridge _bridge) 
     {
@@ -69,7 +89,7 @@ contract Score
 	function addScore(uint256 permalink, 	// permalink on our records
 					  uint128 version,		// version on our records
 					  uint128 relayId,		// relay on our records
-					  bytes memory proof, 	// proof of roothash of relay
+					  bytes calldata proof, // proof of roothash of relay
 					  uint[2] memory a,		// proof of exclusion/inclusion
 					  uint[2][2] memory b,
 					  uint[2] memory c,
@@ -87,7 +107,7 @@ contract Score
     	 emit ScoreIncreased( permalink, score[permalink]);
 	}
 	
-	function addScoreSeal(bytes memory proof,		  // proof of seal,
+	function addScoreSeal(bytes calldata proof,		  // proof of seal,
 						  uint256 maxSealValidityInHours) // seal must be less then maxProofAgeInHours hours old
 							external
 	{
@@ -98,6 +118,34 @@ contract Score
     	 score[permalink]++;
     	 emit ScoreIncreased( permalink, score[permalink]);
 	}
+	
+	function syncScoreTunnel( uint256 permalink, 		// permalink
+							  bytes calldata newScore,	// new score
+							  bytes calldata proof,   // AWS proof,
+							  address contractAddress,// AWS Score address
+							  uint256 blockhashExpiryMinutes,
+							  bytes calldata proofTunnel,
+							  address tunnel) // address of Bridge on mumbai
+							external
+	{
+    	 Tunnel memory t;
+		 (, t.timestamp, t.hash) = listhash.getBlockhash(proofTunnel, tunnel); 
+   
+		 //require( version != 1, "S8 claim is revoked");
+		 t.storageKey = bridge.getMapStorageKey(permalink, 0);
+
+		 {	
+		 (t.valid, t.reason) = 
+			bridge.verifyHash(proof, contractAddress, t.storageKey, 
+							   newScore, blockhashExpiryMinutes, t.hash, t.timestamp);
+		 require( t.valid, t.reason);
+		 }	
+    	    	 
+    	 score[permalink] = bytesToUint(newScore);
+    	 emit ScoreIncreased( permalink, score[permalink]);
+    	 
+	}
+
 	
 	function syncScore( uint256 permalink, 		// permalink
 						bytes calldata newScore,	// new score

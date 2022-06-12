@@ -5,15 +5,23 @@
         "internalType": "address",
         "name": "_checkpointManager",
         "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_fxChildTunnel",
-        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "BLOCKHASH_EVENT_SIG",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "inputs": [],
@@ -68,13 +76,34 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "fxChildTunnel",
-    "outputs": [
+    "inputs": [
+      {
+        "internalType": "bytes",
+        "name": "proof",
+        "type": "bytes"
+      },
       {
         "internalType": "address",
-        "name": "",
+        "name": "fxChildTunnel",
         "type": "address"
+      }
+    ],
+    "name": "getBlockhash",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "blockNumber",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "blockHash",
+        "type": "bytes32"
       }
     ],
     "stateMutability": "view",
@@ -86,6 +115,11 @@
         "internalType": "bytes",
         "name": "proof",
         "type": "bytes"
+      },
+      {
+        "internalType": "address",
+        "name": "fxChildTunnel",
+        "type": "address"
       }
     ],
     "name": "getRoothash",
@@ -115,6 +149,11 @@
         "internalType": "bytes",
         "name": "proof",
         "type": "bytes"
+      },
+      {
+        "internalType": "address",
+        "name": "fxChildTunnel",
+        "type": "address"
       }
     ],
     "name": "getSeal",
@@ -154,6 +193,11 @@
         "internalType": "bytes",
         "name": "proof",
         "type": "bytes"
+      },
+      {
+        "internalType": "address",
+        "name": "fxChildTunnel",
+        "type": "address"
       }
     ],
     "name": "getVersion",

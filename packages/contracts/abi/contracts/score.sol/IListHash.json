@@ -5,6 +5,40 @@
         "internalType": "bytes",
         "name": "proof",
         "type": "bytes"
+      },
+      {
+        "internalType": "address",
+        "name": "fxChildTunnel",
+        "type": "address"
+      }
+    ],
+    "name": "getBlockhash",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "blockNumber",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "blockHash",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes",
+        "name": "proof",
+        "type": "bytes"
       }
     ],
     "name": "getSeal",

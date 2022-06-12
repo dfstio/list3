@@ -37,19 +37,20 @@ contract ListHash {
     bytes32 public constant VERSION_EVENT_SIG  = 0x40779ce7063d5f55ba195a4101faa644098b5c4e985b7d57f5f326e4f6e2af84;
     bytes32 public constant ROOTHASH_EVENT_SIG = 0xf467dc3352c24e3163f55b7f0140fcc06603b14efe5ea1997d0b32da739f4101;
 	bytes32 public constant SEAL_EVENT_SIG =     0xa3a00acaf8b829065e0770f39bf5ac70dd76bec281c2ec75f3789ca4ae9500ca;
+	bytes32 public constant BLOCKHASH_EVENT_SIG =0x37654ed5046f052fd802ed34ba673ed7caec934d9316cd26a7ffd5eaa4e6203f;
 
     // root chain manager
     ICheckpointManager public checkpointManager;
     // child tunnel contract which receives and sends messages
-    address public fxChildTunnel;
+    //address public fxChildTunnel;
 
-    constructor(address _checkpointManager,address _fxChildTunnel) {
+    constructor(address _checkpointManager) {
         checkpointManager = ICheckpointManager(_checkpointManager);
-        fxChildTunnel = _fxChildTunnel;
+        //fxChildTunnel = _fxChildTunnel;
     }
 
 
-    function _validateAndExtractMessage(bytes memory inputData) 
+    function _validateAndExtractMessage(bytes memory inputData, address fxChildTunnel) 
     				internal view returns (ExitPayloadReader.Log memory log, uint256 timestamp) {
         ExitPayloadReader.ExitPayload memory payload = inputData.toExitPayload();
 
@@ -122,10 +123,10 @@ contract ListHash {
      *  9 - receiptLogIndex - Log Index to read from the receipt
      */
      
-    function getVersion(bytes memory proof) 
+    function getVersion(bytes memory proof, address fxChildTunnel) 
     		public view returns ( uint256 roothash, uint256 timestamp, uint256 permalink, uint128 version, uint128 relayId) {
     		
-    		(ExitPayloadReader.Log memory log, uint256 _timestamp) = _validateAndExtractMessage(proof);
+    		(ExitPayloadReader.Log memory log, uint256 _timestamp) = _validateAndExtractMessage(proof, fxChildTunnel);
     		ExitPayloadReader.LogTopics memory topics = log.getTopics();
     		require(bytes32(topics.getField(0).toUint()) == VERSION_EVENT_SIG, // topic0 is event sig
             		"FxRootTunnel: INVALID_SIGNATURE");
@@ -138,10 +139,10 @@ contract ListHash {
 			return (roothash, _timestamp, permalink, version, relayId);		
     }
     
-    function getSeal(bytes memory proof) 
+    function getSeal(bytes memory proof, address fxChildTunnel) 
     		public view returns ( uint256 roothash, uint256 timestamp, uint256 permalink, uint128 version, uint128 relayId) {
     		
-    		(ExitPayloadReader.Log memory log, uint256 _timestamp) = _validateAndExtractMessage(proof);
+    		(ExitPayloadReader.Log memory log, uint256 _timestamp) = _validateAndExtractMessage(proof, fxChildTunnel);
     		ExitPayloadReader.LogTopics memory topics = log.getTopics();
     		require(bytes32(topics.getField(0).toUint()) == SEAL_EVENT_SIG, // topic0 is event sig
             		"FxRootTunnel: INVALID_SIGNATURE");
@@ -154,9 +155,9 @@ contract ListHash {
 			return (roothash, _timestamp, permalink, version, relayId);		
     }
 
-    function getRoothash(bytes memory proof) 
+    function getRoothash(bytes memory proof, address fxChildTunnel) 
     		public view returns ( uint256 roothash, uint256 timestamp, uint128 relayId ) {
-     		(ExitPayloadReader.Log memory log, uint256 _timestamp) = _validateAndExtractMessage(proof);
+     		(ExitPayloadReader.Log memory log, uint256 _timestamp) = _validateAndExtractMessage(proof, fxChildTunnel);
     		ExitPayloadReader.LogTopics memory topics = log.getTopics();
     		require(bytes32(topics.getField(0).toUint()) == ROOTHASH_EVENT_SIG, // topic0 is event sig
             		"FxRootTunnel: INVALID_SIGNATURE");
@@ -166,4 +167,17 @@ contract ListHash {
 			
 			return (roothash, _timestamp, relayId);			
     }
+    
+    function getBlockhash(bytes memory proof, address fxChildTunnel) 
+    		public view returns (  uint256 blockNumber, uint256 timestamp, bytes32 blockHash ) {
+     		(ExitPayloadReader.Log memory log, uint256 _timestamp) = _validateAndExtractMessage(proof, fxChildTunnel);
+    		ExitPayloadReader.LogTopics memory topics = log.getTopics();
+    		require(bytes32(topics.getField(0).toUint()) == BLOCKHASH_EVENT_SIG, // topic0 is event sig
+            		"FxRootTunnel: INVALID_SIGNATURE");
+
+			( blockNumber, timestamp, blockHash ) = abi.decode(log.getData(), (uint256, uint256, bytes32));
+			require( timestamp < _timestamp, "FxRootTunnel: INVALID_TIMESTAMP");
+			return (blockNumber, timestamp, blockHash);			
+    }
+
 }

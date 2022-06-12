@@ -66,5 +66,59 @@
     ],
     "stateMutability": "view",
     "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes",
+        "name": "proofData",
+        "type": "bytes"
+      },
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes",
+        "name": "storageKey",
+        "type": "bytes"
+      },
+      {
+        "internalType": "bytes",
+        "name": "value",
+        "type": "bytes"
+      },
+      {
+        "internalType": "uint256",
+        "name": "blockhashExpiryMinutes",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "_blockhash",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "verifyHash",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "valid",
+        "type": "bool"
+      },
+      {
+        "internalType": "string",
+        "name": "reason",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   }
 ]

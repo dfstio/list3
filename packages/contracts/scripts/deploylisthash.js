@@ -18,8 +18,7 @@ async function main() {
   console.log("Deployer address:", owner);
   // We get the contract to deploy
   const Verifier = await hre.ethers.getContractFactory("ListHash");
-  const verifier = await Verifier.deploy("0x2890bA17EfE978480615e330ecB65333b880928e",
-  										 "0x91478CfAFbD29F4c89CD2e4e89506AFFb89651df");
+  const verifier = await Verifier.deploy("0x2890bA17EfE978480615e330ecB65333b880928e");
 
   await verifier.deployed();
 

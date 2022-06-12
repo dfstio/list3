@@ -57,7 +57,7 @@ async function ethproof(permalink)
 		  
 	//console.log("ethproof: ", data, key);
 	const response = await axios.post(RPC_AWS_ENDPOINT, data);
-	let value = response.data.result.storageProof[0].value.slice(2).toString();
+	let value = response.data.result.storageProof[0].value.toString();
 	console.log("value: ", value);
 	//while( value.length < 64) value = "0" + value;
 	//const version = { relayId: "0x" + value.slice(0,32), version: "0x" + value.slice(32)}
