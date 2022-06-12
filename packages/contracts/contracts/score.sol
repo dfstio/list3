@@ -27,6 +27,21 @@ interface IListHash {
 
 }
 
+interface IBridge {
+
+		function verify(  bytes calldata proofData,
+						  address contractAddress,
+						  bytes calldata storageKey,
+						  bytes calldata value,
+						  uint256 blockhashExpiryMinutes) 
+				external view returns (bool valid, string memory reason);
+
+
+		function getMapStorageKey(uint256 index, uint256 mapPosition) 
+				external pure returns (bytes memory data); 
+
+}
+
 
 contract Score
 {
@@ -39,12 +54,15 @@ contract Score
 
     IVerifier public verifier;
     IListHash public listhash;
+    IBridge   public bridge;
 
 
 
-    constructor(IVerifier _verifier, IListHash _listhash) {
+    constructor(IVerifier _verifier, IListHash _listhash, IBridge _bridge) 
+    {
 			verifier = _verifier;
 			listhash = _listhash;
+			bridge = _bridge;
     }
 
 	
@@ -81,5 +99,23 @@ contract Score
     	 emit ScoreIncreased( permalink, score[permalink]);
 	}
 	
-}
+	function syncScore( uint256 permalink, 		// permalink
+						bytes calldata version,		// new version
+						bytes calldata proof,   // AWS proof,
+						address contractAddress,// AWS Score address
+						uint256 blockhashExpiryMinutes) // hash must be less then blockhashExpiryMinutes minutes old
+							external
+	{
+    	 //require( version != 1, "S8 claim is revoked");
+    	 bytes memory storageKey = bridge.getMapStorageKey(permalink, 0);
+    	 //bytes memory value = abi.encode(version);
+		 (bool valid, string memory reason) = 
+		 	bridge.verify(proof, contractAddress, storageKey, version, blockhashExpiryMinutes);
+		 require( valid, reason);	
+    	 
+    	 score[permalink] = 7;
+    	 emit ScoreIncreased( permalink, score[permalink]);
+	}
 
+	
+}

@@ -1,5 +1,6 @@
 const {RPC_AWS_ENDPOINT, SCOREAWS_ADDRESS, KEY_OWNER, SCORE_ADDRESS,
-		RPC_GOERLI, RPC_MUMBAI, BRIDGE_MUMBAI, BRIDGE_GOERLI, PROVER_MUMBAI } = require('@list/config');
+		RPC_GOERLI, RPC_MUMBAI, BRIDGE_MUMBAI, BRIDGE_GOERLI, PROVER_MUMBAI, SCOREMUMBAI_ADDRESS } = require('@list/config');
+
 
 const BridgeJSON = require("@list/contracts/abi/contracts/bridge.sol/Bridge.json");
 const ProverJSON = require("@list/contracts/abi/contracts/prover.sol/MerkleProver.json");
@@ -128,40 +129,70 @@ async function prove(permalink, value, data, header, blockhash)
 	//const storageAddress = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 	 const expectedValue = rlp.decode(data.accountProof[data.accountProof.length - 1])[1];
+	 const ind = 0;
+	 const kkkey = '0x' + data.storageProof[ind].key.substring(2).padStart(64, '0');
+	 const contractKey = '0x' + expandkey(web3.utils.soliditySha3(data.address));
+	 const storageKey = '0x' + expandkey(web3.utils.soliditySha3(kkkey));
+	 const valueHex = ethers.utils.hexlify(BigInt(data.storageProof[ind].value));
 	 
 	 const accountProof = {
 		 expectedRoot: header.stateRoot,
-		 key: '0x' + expandkey(web3.utils.soliditySha3(data.address)),
+		 key: contractKey,
 		 //key: '0x' + expandkey(ethers.utils.solidityKeccak256(['address'],[data.address])),
 		 proof: data.accountProof,
 		 keyIndex: 0,
 		 proofIndex: 0,
 		 expectedValue: buffer2hex(expectedValue)
 	 }
-	 const ind = 0;
-	 const kkkey = '0x' + data.storageProof[ind].key.substring(2).padStart(64, '0');
+
 
 	 const storageProof = {
 		 expectedRoot: data.storageHash,
-		 key: '0x' + expandkey(web3.utils.soliditySha3(kkkey)),
+		 key: storageKey,
 		 //key: '0x' + expandkey(ethers.utils.solidityKeccak256(['address'],[kkkey])),
 		 proof: data.storageProof[ind].proof,
 		 keyIndex: 0,
 		 proofIndex: 0,
-		 expectedValue: ethers.utils.hexlify(BigInt(data.storageProof[ind].value)),
+		 expectedValue: valueHex,
 	 }
-	 console.log("prove data: ", accountProof, data.address, web3.utils.soliditySha3(data.address));
+	 console.log("prove data: ", valueHex);
 	 
 	 const provider = new ethers.providers.JsonRpcProvider(RPC_MUMBAI);
 	 const wallet = new ethers.Wallet(KEY_OWNER);
 
      const signer = wallet.connect(provider);
-	 const prover = new ethers.Contract(PROVER_MUMBAI, ProverJSON, signer);
+	 const bridge = new ethers.Contract(BRIDGE_MUMBAI, BridgeJSON, provider);
+	 const score = new ethers.Contract(SCOREMUMBAI_ADDRESS, ScoreJSON, signer);
 
+	 const proof = { header: header, accountProof: accountProof, storageProof: storageProof };
+	 
+	 
+	 const proofTypes = [ 
+			"tuple(bytes32 hash,bytes32 parentHash,bytes32 sha3Uncles,address miner,bytes32 stateRoot,bytes32 transactionsRoot,bytes32 receiptsRoot,bytes logsBloom,uint256 difficulty,uint256 number,uint256 gasLimit,uint256 gasUsed,uint256 timestamp,bytes extraData,bytes32 mixHash,uint64 nonce,uint256 totalDifficulty) header",
+		 	"tuple(bytes32 expectedRoot ,bytes key,bytes[] proof,uint256 keyIndex,uint256 proofIndex,bytes expectedValue) accountProof",
+		 	"tuple(bytes32 expectedRoot ,bytes key,bytes[] proof,uint256 keyIndex,uint256 proofIndex,bytes expectedValue) storageProof"];
+
+ 
+	 const abiCoder = ethers.utils.defaultAbiCoder;
+	 const proofData = abiCoder.encode(proofTypes, [header, accountProof, storageProof] );
+	 //console.log("proofData", proofData);
+     let check = await bridge.verify(proofData, data.address, data.storageProof[0].key, valueHex, 24 * 60 );
      
-     //console.log("prove data: ", storageProof);
-     let check = await prover.verify(header, accountProof, storageProof, blockhash );
+     let key = await bridge.getMapStorageKey(permalink, 0);
+     console.log("key", key, data.storageProof[0].key);
      console.log("verify on Mumbai response: ", check);
+     
+     const tx = await score.syncScore(
+			permalink,
+			valueHex,
+			proofData,
+			data.address,
+	 		24 * 60);
+
+	console.log("TX sent: ", tx.hash);
+	const receipt = await tx.wait(1);
+	//console.log('Transaction receipt', receipt);
+				  
 };
 
 

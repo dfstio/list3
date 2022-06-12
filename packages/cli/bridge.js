@@ -16,8 +16,8 @@ async function bridge()
 	console.log("Sealing on mumbai...");
 	await seal( RPC_MUMBAI, BRIDGE_MUMBAI, block);
 	
-	console.log("Sealing on goerli...");
-	await seal( RPC_GOERLI, BRIDGE_GOERLI, block);
+	//console.log("Sealing on goerli...");
+	//await seal( RPC_GOERLI, BRIDGE_GOERLI, block);
 }
 
 async function seal(rpc, contract, block)

@@ -36,34 +36,45 @@
     "type": "event"
   },
   {
-    "inputs": [],
-    "name": "blockHash",
-    "outputs": [
+    "anonymous": false,
+    "inputs": [
       {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
+        "indexed": false,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
       }
     ],
-    "stateMutability": "view",
-    "type": "function"
+    "name": "Owner",
+    "type": "event"
   },
   {
-    "inputs": [],
-    "name": "blockNumber",
-    "outputs": [
+    "inputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "index",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "mapPosition",
         "type": "uint256"
       }
     ],
-    "stateMutability": "view",
+    "name": "getMapStorageKey",
+    "outputs": [
+      {
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
+      }
+    ],
+    "stateMutability": "pure",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "blockTimestamp",
+    "name": "lastBlockNumber",
     "outputs": [
       {
         "internalType": "uint256",
@@ -108,6 +119,63 @@
     "name": "seal",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transfer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes",
+        "name": "proofData",
+        "type": "bytes"
+      },
+      {
+        "internalType": "address",
+        "name": "contractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes",
+        "name": "storageKey",
+        "type": "bytes"
+      },
+      {
+        "internalType": "bytes",
+        "name": "value",
+        "type": "bytes"
+      },
+      {
+        "internalType": "uint256",
+        "name": "blockhashExpiryMinutes",
+        "type": "uint256"
+      }
+    ],
+    "name": "verify",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "valid",
+        "type": "bool"
+      },
+      {
+        "internalType": "string",
+        "name": "reason",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   }
 ]
