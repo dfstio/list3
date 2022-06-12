@@ -51,35 +51,36 @@ contract Bridge
 			 emit Blockhash(_blocknumber, _blocktimestamp, _blockhash); 
 		}
 		
-
-	
 		function verify(  bytes calldata proofData,
 						  address contractAddress,
 						  bytes calldata storageKey,
 						  bytes calldata value,
 						  uint256 blockhashExpiryMinutes) 
-				public view returns (bool valid, string memory reason)
+				external view returns (bool valid, string memory reason)
 		{
 			(EthereumDecoder.BlockHeader memory header, 
 				MPT.MerkleProof memory accountProof, 
 				MPT.MerkleProof memory storageProof) = 
 					abi.decode(proofData, (EthereumDecoder.BlockHeader, MPT.MerkleProof, MPT.MerkleProof));
-				
+							
+			// verify blockhash
+			if (timestamp[header.hash] == 0) return (false, "Unregistered block hash");
+			
 			//verify proof
 			if (keccak256(expand(abi.encodePacked(keccak256(storageKey)))) != keccak256(storageProof.key)) 
 				return (false, "verifyStorage - different keys");
-			//if (keccak256(storageKey) != keccak256(storageProof.key)) return (false, "verifyStorage - different keys");
 
-			if (keccak256(value) != keccak256(storageProof.expectedValue)) return (false, "verifyStorage - different values");
-			//if (keccak256(contractKey) != keccak256(accountProof.key)) return (false, "verifyAccount - different keys");
-			if (keccak256(expand(getContractKey(contractAddress))) != keccak256(accountProof.key)) return (false, "verifyAccount - different keys");
+			if (keccak256(value) != keccak256(storageProof.expectedValue)) 
+				return (false, "verifyStorage - different values");
+			if (keccak256(expand(getContractKey(contractAddress))) != keccak256(accountProof.key)) 
+				return (false, "verifyAccount - different keys");
 			
 			// verify header
 			bytes32 blockHash = keccak256(getBlockRlpData(header));
 			if (blockHash != header.hash) return (false, "Header data or hash invalid");
 			
 			// verify blockhash
-			if (timestamp[blockHash] == 0) return (false, "Unregistered block hash");
+			if (blockHash != header.hash) return (false, "Wrong blockhash");
 		    if( block.timestamp > (timestamp[blockHash] + blockhashExpiryMinutes * 1 minutes))
 		    	return (false, "block hash is expired");
 
@@ -93,7 +94,56 @@ contract Bridge
 			if (false == storageProof.verifyTrieProof()) return (false, "verifyStorage - invalid storage proof");
 			
 			return (true, "");
+
+
+
 		}
+
+		function verifyHash( bytes calldata proofData,
+							 address contractAddress,
+							 bytes calldata storageKey,
+							 bytes calldata value,
+							 uint256 blockhashExpiryMinutes,
+							 bytes32 _blockhash,
+							 uint256 _timestamp) 
+				external view returns (bool valid, string memory reason)
+		{
+			(EthereumDecoder.BlockHeader memory header, 
+				MPT.MerkleProof memory accountProof, 
+				MPT.MerkleProof memory storageProof) = 
+					abi.decode(proofData, (EthereumDecoder.BlockHeader, MPT.MerkleProof, MPT.MerkleProof));
+				
+			 //verify proof
+			if (keccak256(expand(abi.encodePacked(keccak256(storageKey)))) != keccak256(storageProof.key)) 
+				return (false, "verifyStorage - different keys");
+
+			if (keccak256(value) != keccak256(storageProof.expectedValue)) 
+				return (false, "verifyStorage - different values");
+			if (keccak256(expand(getContractKey(contractAddress))) != keccak256(accountProof.key)) 
+				return (false, "verifyAccount - different keys");
+			
+			// verify header
+			bytes32 blockHash = keccak256(getBlockRlpData(header));
+			if (blockHash != header.hash) return (false, "Header data or hash invalid");
+			
+			// verify blockhash
+			if (blockHash != _blockhash) return (false, "Wrong blockhash");
+		    if( block.timestamp > (_timestamp + blockhashExpiryMinutes * 1 minutes))
+		    	return (false, "block hash is expired");
+
+			// verify account
+			if (header.stateRoot != accountProof.expectedRoot) return (false, "verifyAccount - different trie roots");
+			if (false == accountProof.verifyTrieProof()) return (false, "verifyAccount - invalid account proof");
+		
+			// verify storage
+			EthereumDecoder.Account memory account = EthereumDecoder.toAccount(accountProof.expectedValue);
+			if (account.storageRoot != storageProof.expectedRoot) return (false, "verifyStorage - different trie roots");
+			if (false == storageProof.verifyTrieProof()) return (false, "verifyStorage - invalid storage proof");
+			
+			return (true, "");
+
+		}
+
 
 		function getMapStorageKey(uint256 index, uint256 mapPosition) external pure returns (bytes memory data) 
 		{

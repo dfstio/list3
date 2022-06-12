@@ -51,9 +51,9 @@ https://goerli.etherscan.io/address/0xB24f820BaA49697D5af186955b4b4671E68Ce8F1
 Verifier deployed to Goerli: 0xd58bf69DaBcAEfe8D1EAd6327190ff215F5b0c3f  
 https://goerli.etherscan.io/address/0xd58bf69DaBcAEfe8D1EAd6327190ff215F5b0c3f 
 
-Score example contract deployed to Goerli: 0xbAA0D0Df5046081aa6d80Fa77E6113BE1cc7be11  
-https://goerli.etherscan.io/address/0xbAA0D0Df5046081aa6d80Fa77E6113BE1cc7be11 
-https://mumbai.polygonscan.com/address/0x082b0e61B85326Cb738df9435D1c187486f8E286#code
+Score example contract deployed to Goerli: 0x6145E4c12CEd552C28FEC4753b64C26c53028010  
+https://goerli.etherscan.io/address/0x6145E4c12CEd552C28FEC4753b64C26c53028010 
+https://mumbai.polygonscan.com/address/0x8dD9A8C0a838E0BE1A64FE51348EE1b18AF6bf51#code
 
 ScoreAWS example contract deployed to AWS: 0x8750A33948C11E21484fb21e9Ff2D0e238e8527f
 
@@ -73,8 +73,8 @@ VerifierPermalink contract is deployed to mumbai network at address 0xb6514E22ef
 https://mumbai.polygonscan.com/address/0xb6514E22ef505d8bD1AF6A39cB0FB578c9241515  
 
 Bridge contracts are deployed to:
-mumbai 0xd11C528609bE52C433Ee1c200a5aE0056b600379 https://mumbai.polygonscan.com/address/0xd11C528609bE52C433Ee1c200a5aE0056b600379#code
-goerli 0x6e706Fac3d10C6Bd7dBe86EaF5d6e65ED31d3224 https://goerli.etherscan.io/address/0x6e706Fac3d10C6Bd7dBe86EaF5d6e65ED31d3224#code
+mumbai 0xF4084E4dfC2B85885d9CFd58134eE0939A4Af89D https://mumbai.polygonscan.com/address/0xF4084E4dfC2B85885d9CFd58134eE0939A4Af89D#code
+goerli 0xdf9D69197Ff058D24f0E170a49E0D03ebC723d2e https://goerli.etherscan.io/address/0xdf9D69197Ff058D24f0E170a49E0D03ebC723d2e#code
 
 Prover contract is deployed to:
 goerli 0xecc438f80adc0bfEeEA580f8DCbda00247884C08 https://goerli.etherscan.io/address/0xecc438f80adc0bfEeEA580f8DCbda00247884C08#code
