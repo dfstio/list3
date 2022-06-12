@@ -150,7 +150,7 @@ async function prove(permalink, value, data, header, blockhash)
 		 proofIndex: 0,
 		 expectedValue: ethers.utils.hexlify(BigInt(data.storageProof[ind].value)),
 	 }
-	 //console.log("prove data: ", accountProof, storageProof);
+	 console.log("prove data: ", accountProof, data.address, web3.utils.soliditySha3(data.address));
 	 
 	 const provider = new ethers.providers.JsonRpcProvider(RPC_MUMBAI);
 	 const wallet = new ethers.Wallet(KEY_OWNER);
@@ -159,7 +159,7 @@ async function prove(permalink, value, data, header, blockhash)
 	 const prover = new ethers.Contract(PROVER_MUMBAI, ProverJSON, signer);
 
      
-     console.log("prove data: ", blockhash);
+     //console.log("prove data: ", storageProof);
      let check = await prover.verify(header, accountProof, storageProof, blockhash );
      console.log("verify on Mumbai response: ", check);
 };
@@ -249,9 +249,9 @@ async function awsproof(permalink)
 								1));
 
 	*/
-	let permalinkHex = BigInt(permalink).toString(16);
+	let permalinkHex = BigInt(permalink).toString(16).padStart(64, '0');
 	//console.log("ethproof: ", permalink, permalinkHex, permalinkHex.length);
-	while( permalinkHex.length < 64) permalinkHex = "0" + permalinkHex;
+	//while( permalinkHex.length < 64) permalinkHex = "0" + permalinkHex;
 	
 	// position of map versions is 0x00
 	const key = "0x" + toHex(keccak256(hexToBytes(permalinkHex +
@@ -266,7 +266,7 @@ async function awsproof(permalink)
 						block],
 				  "id":1 };
 		  
-	//console.log("ethproof: ", data);
+	console.log("ethproof: ", data);
 
 	const response = await axios.post(RPC_AWS_ENDPOINT, data);
 	// console.log("response: ", response);
@@ -285,7 +285,7 @@ async function awsproof(permalink)
 	let value = response.data.result.storageProof[0].value.slice(2).toString();
 	console.log("Value from AWS chain: ", value);
 	//console.log("proof: ", response.data.result); //.result.storageProof[0]
-	//console.log("storageProof: ", response.data.result.storageProof[0]);
+	console.log("storageProof: ", response.data.result.storageProof[0]);
 	
  	
  	const getAndVerify = new GetAndVerify(RPC_AWS_ENDPOINT);
