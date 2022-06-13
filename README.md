@@ -76,6 +76,11 @@ Bridge contracts are deployed to:
 mumbai 0xF4084E4dfC2B85885d9CFd58134eE0939A4Af89D https://mumbai.polygonscan.com/address/0xF4084E4dfC2B85885d9CFd58134eE0939A4Af89D#code
 goerli 0xdf9D69197Ff058D24f0E170a49E0D03ebC723d2e https://goerli.etherscan.io/address/0xdf9D69197Ff058D24f0E170a49E0D03ebC723d2e#code
 
+Gnosis safe is deployed to Goerli:
+https://gnosis-safe.io/app/
+aws-bridge
+gor:0x08904B6bD83A99BF95ecaF7dF76a83fB67C991fA
+
 Prover contract is deployed to:
 goerli 0xecc438f80adc0bfEeEA580f8DCbda00247884C08 https://goerli.etherscan.io/address/0xecc438f80adc0bfEeEA580f8DCbda00247884C08#code
 

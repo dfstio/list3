@@ -1,8 +1,10 @@
 const {RPC_GOERLI, RPC_MUMBAI, RPC_AWS_ENDPOINT, RPC_AWS_PASSWORD, RPC_AWS_USER, 
-		KEY_OWNER, BRIDGE_MUMBAI, BRIDGE_GOERLI } = require('@list/config');
+		KEY_OWNER, BRIDGE_MUMBAI, BRIDGE_GOERLI, SAFE_GOERLI } = require('@list/config');
 const RPC_AWS =  {url: RPC_AWS_ENDPOINT,  user: RPC_AWS_USER, password: RPC_AWS_PASSWORD};
 const BridgeJSON = require("@list/contracts/abi/contracts/bridge.sol/Bridge.json");
 const ethers = require("ethers");
+
+//const { safeSeal } = require("./safe");
 
 
 async function bridge()
@@ -17,6 +19,7 @@ async function bridge()
 	await seal( RPC_MUMBAI, BRIDGE_MUMBAI, block);
 	
 	console.log("Sealing on goerli...");
+	//await safeSeal( RPC_GOERLI, BRIDGE_GOERLI, block, SAFE_GOERLI);
 	await seal( RPC_GOERLI, BRIDGE_GOERLI, block);
 }
 

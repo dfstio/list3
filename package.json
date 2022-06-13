@@ -19,8 +19,7 @@
 	  "push": "git push -u originlist3 master",
 	  "gitcreate": "git remote add originlist3 https://github.com/Benjamin-Herald/list3",
 	  "commit": "git commit -a -S -m",
-	  "link": "npm link",
-	  "postinstall": "cd packages/server && npm install && npm run build"  
+	  "link": "npm link" 
    },
    "bin" : {
     "list" : "./packages/cli/cli.js"
