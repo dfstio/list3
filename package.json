@@ -19,6 +19,7 @@
 	  "push": "git push -u originlist3 master",
 	  "gitcreate": "git remote add originlist3 https://github.com/Benjamin-Herald/list3",
 	  "commit": "git commit -a -S -m",
+	  "githubcleartoken": "git config --global --unset credential.helper",
 	  "link": "npm link" 
    },
    "bin" : {
