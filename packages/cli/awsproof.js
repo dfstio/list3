@@ -187,7 +187,8 @@ async function awsmumbai(permalink)
 		  
 
 	const response = await axios.post(RPC_AWS_ENDPOINT, data);
-
+	console.log("response: ", response.data);
+	
 	const blockData = {"jsonrpc":"2.0",
 				  		"method":"eth_getBlockByNumber",
 				  		"params":[block, false],
@@ -240,19 +241,28 @@ async function awsproof(permalink)
 	const key = "0x" + toHex(keccak256(hexToBytes(permalinkHex +
 								 "0000000000000000000000000000000000000000000000000000000000000000"))).toString();
 	const block = "0x" + parseInt(blockGoerli.number.toString()).toString(16);
-   
+
+/*
+	const blockData1 = {"jsonrpc":"2.0",
+				  		"method":"eth_getBlockByNumber",
+				  		"params":["latest", false],
+				  		"id":1 };
+	//const rpcBlock1 = await axios.post(RPC_AWS_ENDPOINT, blockData1);
+	//console.log("block data: ", rpcBlock1.data.result);
+	//const block = "0x" + parseInt((rpcBlock1.data.result.number - 4270).toString()).toString(16);;
+*/
 	const data = {"jsonrpc":"2.0",
 				  "method":"eth_getProof",
 				  "params":[
 						SCOREAWS_ADDRESS,
 						[key],
-						block],
+						block], 
 				  "id":1 };
 		  
 	//console.log("ethproof: ", data);
 
 	const response = await axios.post(RPC_AWS_ENDPOINT, data);
-	// console.log("response: ", response);
+	console.log("response: ", response.data);
 	
 	
 	const blockData = {"jsonrpc":"2.0",
