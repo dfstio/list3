@@ -206,6 +206,7 @@ async function awsmumbai(permalink)
      
     console.log("Calling scoreSyncTunnel on Goerli..."); 
 	
+	try {
 	const tx = await score.syncScoreTunnel(
 			permalink,
 			proof.value,
@@ -214,10 +215,17 @@ async function awsmumbai(permalink)
 	 		24 * 60,
 	 		blockMumbai.proof,
 	 		BRIDGE_MUMBAI);
-	 		
 	console.log("TX sent: ", tx.hash);
 	const receipt = await tx.wait(1);
 	console.log('Transaction block:', receipt.blockNumber);
+
+
+ 	} catch (error) {
+      console.error("catch tx", error.toString().substr(0,500));
+      return;
+    }
+	 		
+
 }
 
 async function awsproof(permalink)
