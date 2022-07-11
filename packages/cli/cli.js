@@ -5,11 +5,12 @@ const program = new Command();
 const { add, madd, update, revoke, verify } = require("./list");
 const { claim } = require("./claim");
 const { score, seal } = require("./score");
-const { scoreaws } = require("./scoreaws");
+const { scoreaws, setscore } = require("./scoreaws");
 const { awsproof } = require("./awsproof");
 const { bridge, getBlock } = require("./bridge");
 const { checkEthereum, ethproof } = require("./ethereum");
 const { sample } = require("./smt");
+const { L3 } = require("./l3");
 
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
@@ -104,11 +105,29 @@ program.command('score')
 program.command('scoreaws')
   .description('Example: Add score with transaction on AWS')
   .argument('<permalink>', 'claim permalink')
-  .action(async (permalink) => {
-    console.log('Adding AWS score to ', permalink);
-    await scoreaws(permalink);
+  .option('-count <number>', 'how many calls made')
+  .action(async (permalink, options) => {
+    const count = options.Count? options.Count : 1 ;
+    console.log('Adding AWS score to ', permalink, count,  "times");
+    await scoreaws(permalink, count);
   });  
+ 
+ program.command('setscore')
+  .description('Example: Set score to value with transaction on AWS')
+  .argument('<permalink>', 'claim permalink')
+  .argument('<value', 'value')
+  .action(async (permalink, value) => {
+    console.log('Setting AWS score', permalink, ' to ', value);
+    await setscore(permalink, value);
+  });  
+
   
+program.command('L3')
+  .description('Calling L3')
+  .action(async () => {
+    console.log('Calling L3... ');
+    await L3();
+  });  
 
 program.command('bridge')
   .description('Sealing blocknumber and blockhash on Mumbai and Goerli')

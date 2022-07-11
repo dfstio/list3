@@ -1,6 +1,6 @@
-const {RPC_GOERLI, RPC_MUMBAI, RPC_AWS_ENDPOINT, RPC_AWS_PASSWORD, RPC_AWS_USER, 
+const {RPC_GOERLI, RPC_MUMBAI,  RPC_L3_ENDPOINT, RPC_L3_PASSWORD, RPC_L3_USER, 
 		KEY_OWNER, BRIDGE_MUMBAI, BRIDGE_GOERLI, SAFE_GOERLI } = require('@list/config');
-const RPC_AWS =  {url: RPC_AWS_ENDPOINT,  user: RPC_AWS_USER, password: RPC_AWS_PASSWORD};
+const RPC_L3 =  {url: RPC_L3_ENDPOINT,  user: RPC_L3_USER, password: RPC_L3_PASSWORD};
 const BridgeJSON = require("@list/contracts/abi/contracts/bridge.sol/Bridge.json");
 const ethers = require("ethers");
 const axios = require('axios');
@@ -10,20 +10,24 @@ const axios = require('axios');
 
 async function bridge()
 {	
-	const awsprovider = new ethers.providers.JsonRpcProvider(RPC_AWS);
-	console.log("Getting latest AWS block information...");
-	const block = await awsprovider.getBlock("latest");
-	console.log("Block:");
-	console.log(JSON.stringify(block, null, 1));
+	const awsprovider = new ethers.providers.JsonRpcProvider(RPC_L3);
+	console.log("Getting latest L3 block information...");
+	const block = await getBlock();
+	//console.log("Block:");
+	//console.log(JSON.stringify(block, null, 1));
 	
-	console.log(" ");
-	console.log("Sealing on mumbai...");
-	await seal( RPC_MUMBAI, BRIDGE_MUMBAI, block);
 	
 	console.log(" ");
 	console.log("Sealing on goerli...");
 	//await safeSeal( RPC_GOERLI, BRIDGE_GOERLI, block, SAFE_GOERLI);
 	await seal( RPC_GOERLI, BRIDGE_GOERLI, block);
+
+
+
+	//console.log(" ");
+	//console.log("Sealing on mumbai...");
+	//await seal( RPC_MUMBAI, BRIDGE_MUMBAI, block);
+	
 }
 
 async function seal(rpc, contract, block)
@@ -61,21 +65,21 @@ async function seal(rpc, contract, block)
 	console.log( "Gas params: maxFeePerGas",  (gas.maxFeePerGas/1000000000).toString(), "maxPriorityFeePerGas", (gas.maxPriorityFeePerGas/1000000000).toString());
 	const tx = await bridge.seal(block.number, block.timestamp, block.hash, 
 			{ 
-			  maxFeePerGas: gas.maxFeePerGas, 
-			  maxPriorityFeePerGas: gas.maxPriorityFeePerGas });
+			  maxFeePerGas: gas.maxFeePerGas * 4 , 
+			  maxPriorityFeePerGas: gas.maxPriorityFeePerGas * 4 });
 	console.log("TX sent: ", tx.hash);
-	const receipt = await tx.wait(1);
+	const receipt = await tx.wait(2);
 	console.log('Transaction block:', receipt.blockNumber);
 }
 
 async function getBlock()
 {	
-	const provider = new ethers.providers.JsonRpcProvider(RPC_GOERLI);
-	const block = await provider.getBlock("latest");
+	const provider = new ethers.providers.JsonRpcProvider(RPC_L3);
+	const lastBlock = await provider.getBlock("latest");
+	const block = await provider.getBlock(lastBlock.number); // -15
 	let date = new Date(block.timestamp*1000);
 	console.log("Block:", block.number, date.toUTCString());
-	//console.log(JSON.stringify(block.number, null, 1));
-
+	return block;
 };
 
 module.exports = {

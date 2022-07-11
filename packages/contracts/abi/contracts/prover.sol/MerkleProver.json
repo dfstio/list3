@@ -138,6 +138,11 @@
             "internalType": "uint256",
             "name": "totalDifficulty",
             "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "baseFeePerGas",
+            "type": "uint256"
           }
         ],
         "internalType": "struct EthereumDecoder.BlockHeader",

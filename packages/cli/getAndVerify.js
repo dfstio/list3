@@ -55,24 +55,30 @@ class GetAndVerify{
   }
 
   async storageAgainstBlockNumber(accountAddress, position, trustedBlockNumber, trustedBlockHash){
-     //console.log("storageAgainstBlockHash called:", accountAddress, position, trustedBlockHash);
+    console.log("storageAgainstBlockHash called:", accountAddress, position, trustedBlockHash);
     let resp = await this.get.storageProofByBlockNumber(accountAddress, position, trustedBlockNumber)
+    //console.log("resp", resp);
     let blockHashFromHeader = VerifyProof.getBlockHashFromHeader(resp.header)
-    if(!toBuffer(trustedBlockHash).equals(blockHashFromHeader)) throw new Error('BlockHash mismatch')
+    // London fork - disable now
+    //if(!toBuffer(trustedBlockHash).equals(blockHashFromHeader)) throw new Error('BlockHash mismatch')
     console.log("blockHashFromHeader:", "0x" + blockHashFromHeader.toString('hex'));
     let stateRoot = VerifyProof.getStateRootFromHeader(resp.header)
     let stateRootFromProof = VerifyProof.getRootFromProof(resp.accountProof)
     if(!stateRoot.equals(stateRootFromProof)) throw new Error('StateRoot mismatch')
     console.log("stateRoot:",  "0x" + stateRoot.toString('hex'));
     let account = await VerifyProof.getAccountFromProofAt(resp.accountProof, accountAddress)
-    //console.log("account:", account );
+    console.log("account:", account );
     let storageRoot = VerifyProof.accountContainsStorageRoot(account)
     console.log("storageRoot:",  "0x" + storageRoot.toString('hex') );
     let storageRootFromProof = VerifyProof.getRootFromProof(resp.storageProof)
     if(!storageRoot.equals(storageRootFromProof)) throw new Error('StorageRoot mismatch')
+    const value = await VerifyProof.getStorageFromStorageProofAt(resp.storageProof, position);
     
-    return VerifyProof.getStorageFromStorageProofAt(resp.storageProof, position)
+    return { value: value,
+    		 proof: resp };
   }
+
+
 
   async _logAgainstBlockHash(txHash, indexOfLog, trustedBlockHash){
     // untested as of yet

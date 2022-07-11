@@ -29,6 +29,7 @@ library EthereumDecoder {
         bytes32 mixHash;
         uint64 nonce;
         uint256 totalDifficulty;
+        uint256 baseFeePerGas;
     }
 
     struct Account {
@@ -83,7 +84,7 @@ library EthereumDecoder {
     }
 
     function getBlockRlpData(BlockHeader memory header) internal pure returns (bytes memory data) {
-        bytes[] memory list = new bytes[](15);
+        bytes[] memory list = new bytes[](16);
 
         list[0] = RLPEncode.encodeBytes(abi.encodePacked(header.parentHash));
         list[1] = RLPEncode.encodeBytes(abi.encodePacked(header.sha3Uncles));
@@ -100,6 +101,7 @@ library EthereumDecoder {
         list[12] = RLPEncode.encodeBytes(header.extraData);
         list[13] = RLPEncode.encodeBytes(abi.encodePacked(header.mixHash));
         list[14] = RLPEncode.encodeBytes(abi.encodePacked(header.nonce));
+        list[15] = RLPEncode.encodeUint(header.baseFeePerGas);
 
         data = RLPEncode.encodeList(list);
     }
@@ -125,6 +127,7 @@ library EthereumDecoder {
             else if ( idx == 12 ) header.extraData       = it.next().toBytes();
             else if ( idx == 13 ) header.mixHash         = bytes32(it.next().toUint());
             else if ( idx == 14 ) header.nonce           = uint64(it.next().toUint());
+            else if ( idx == 15 ) header.baseFeePerGas   = it.next().toUint();
             // else if ( idx == 13 ) header.nonce           = uint64(it.next().toUint());
             else it.next();
             idx++;

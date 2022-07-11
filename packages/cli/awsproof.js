@@ -1,5 +1,9 @@
-const {RPC_AWS_ENDPOINT, SCOREAWS_ADDRESS, KEY_OWNER, SCORE_ADDRESS,
-		RPC_GOERLI, RPC_MUMBAI, BRIDGE_MUMBAI, BRIDGE_GOERLI, PROVER_MUMBAI, SCOREMUMBAI_ADDRESS } = require('@list/config');
+const { RPC_L3_ENDPOINT, RPC_L3_PASSWORD, RPC_L3_USER, SCOREAWS_ADDRESS, KEY_OWNER, SCORE_ADDRESS,
+		RPC_GOERLI, RPC_MUMBAI, BRIDGE_MUMBAI, BRIDGE_GOERLI, PROVER_MUMBAI, 
+		SCOREAWS_MUMBAI, SCOREMUMBAI_ADDRESS } = require('@list/config');
+const RPC_L3 =  {url: RPC_L3_ENDPOINT,  user: RPC_L3_USER, password: RPC_L3_PASSWORD};
+//const RPC_L3_AXIOS = "https://" + RPC_L3_USER + ":" + RPC_L3_PASSWORD + "@rpc.nftvirtuoso.io" ; 
+const RPC_L3_AXIOS = "https://" + RPC_L3_USER + ":" + RPC_L3_PASSWORD + "@" + RPC_L3_ENDPOINT.replace("https://", "");
 
 
 const BridgeJSON = require("@list/contracts/abi/contracts/bridge.sol/Bridge.json");
@@ -60,15 +64,19 @@ async function generateProof(data, header)
 		 expectedValue: valueHex,
 	 }
 	 
+	 console.log("storageProof", storageProof );
 	 const proofTypes = [ 
-			"tuple(bytes32 hash,bytes32 parentHash,bytes32 sha3Uncles,address miner,bytes32 stateRoot,bytes32 transactionsRoot,bytes32 receiptsRoot,bytes logsBloom,uint256 difficulty,uint256 number,uint256 gasLimit,uint256 gasUsed,uint256 timestamp,bytes extraData,bytes32 mixHash,uint64 nonce,uint256 totalDifficulty) header",
+			"tuple(bytes32 hash,bytes32 parentHash,bytes32 sha3Uncles,address miner,bytes32 stateRoot,bytes32 transactionsRoot,bytes32 receiptsRoot,bytes logsBloom,uint256 difficulty,uint256 number,uint256 gasLimit,uint256 gasUsed,uint256 timestamp,bytes extraData,bytes32 mixHash,uint64 nonce,uint256 totalDifficulty, uint256 baseFeePerGas) header",
 		 	"tuple(bytes32 expectedRoot ,bytes key,bytes[] proof,uint256 keyIndex,uint256 proofIndex,bytes expectedValue) accountProof",
 		 	"tuple(bytes32 expectedRoot ,bytes key,bytes[] proof,uint256 keyIndex,uint256 proofIndex,bytes expectedValue) storageProof"];
 
  
 	 const abiCoder = ethers.utils.defaultAbiCoder;
 	 const proofData = abiCoder.encode(proofTypes, [header, accountProof, storageProof] );
-	 //console.log("proofData", proofData);
+	 const proofData1 = abiCoder.encode(["bytes"], ["0x80"] );
+	 console.log("proofData1", proofData1);
+	 const proofData2 = abiCoder.encode(["bytes"], ["0x7F"] );
+	 console.log("proofData1", proofData2);
 
 	 return { data: proofData, value: valueHex};	  
 };
@@ -186,15 +194,15 @@ async function awsmumbai(permalink)
 				  "id":1 };
 		  
 
-	const response = await axios.post(RPC_AWS_ENDPOINT, data);
-	console.log("response: ", response.data);
+	const response = await axios.post(RPC_L3_AXIOS, data);
+	//console.log("response: ", response.data);
 	
 	const blockData = {"jsonrpc":"2.0",
 				  		"method":"eth_getBlockByNumber",
 				  		"params":[block, false],
 				  		"id":1 };
 
-	const rpcBlock = await axios.post(RPC_AWS_ENDPOINT, blockData);		
+	const rpcBlock = await axios.post(RPC_L3_AXIOS, blockData);		
 	const proof = await generateProof(response.data.result, rpcBlock.data.result); 
 	const end2 = Date.now();
 	console.log("Done in", (end2-start2)/1000, "sec");
@@ -226,6 +234,20 @@ async function awsmumbai(permalink)
     }
 	 		
 
+}
+
+function web3ify(input) 
+{
+  console.log("input", input);
+  let output = {}
+  output.value = '0x' + rlp.encode(input.value).toString('hex')
+  output.header = '0x' + rlp.encode(input.header).toString('hex')
+  output.path = '0x00' + input.path.toString('hex')
+  //output.path = (output.path.length%2==0 ? '0x00' : '0x1') + output.path
+  output.parentNodes = '0x' + rlp.encode(input.parentNodes).toString('hex')
+  output.txRoot = '0x' + input.header[4].toString('hex')
+  output.blockHash = '0x' + input.blockHash.toString('hex')
+  return output
 }
 
 async function awsproof(permalink)
@@ -269,8 +291,8 @@ async function awsproof(permalink)
 		  
 	//console.log("ethproof: ", data);
 
-	const response = await axios.post(RPC_AWS_ENDPOINT, data);
-	console.log("response: ", response.data);
+	const response = await axios.post(RPC_L3_AXIOS, data);
+	//console.log("response: ", response.data);
 	
 	
 	const blockData = {"jsonrpc":"2.0",
@@ -279,17 +301,17 @@ async function awsproof(permalink)
 				  		"id":1 };
 
 	//console.log("block data: ", blockData);
-	const rpcBlock = await axios.post(RPC_AWS_ENDPOINT, blockData);
+	const rpcBlock = await axios.post(RPC_L3_AXIOS, blockData);
 	//console.log("block data: ", rpcBlock.data.result);
 	
 	
 	let value = response.data.result.storageProof[0].value.toString();
-	console.log("Value from AWS chain: ", value);
+	console.log("Value from L3 chain: ", value, response.data.result.storageProof[0]);
 	//console.log("proof: ", response.data.result); //.result.storageProof[0]
 	//console.log("storageProof: ", response.data.result.storageProof[0]);
 	
  	
- 	const getAndVerify = new GetAndVerify(RPC_AWS_ENDPOINT);
+ 	const getAndVerify = new GetAndVerify(RPC_L3_AXIOS);
  	
     let blockHash       = blockGoerli.hash;
     let accountAddress  = SCOREAWS_ADDRESS;
@@ -299,12 +321,15 @@ async function awsproof(permalink)
 
 	   console.log("Verifying proof...");
 	   let storageValue = await getAndVerify.storageAgainstBlockNumber(accountAddress, position, block, blockHash);
-	   console.log("Value after verifying proof off-chain:", storageValue.toString('hex'));
+	   console.log("Value after verifying proof off-chain:", "0x"+storageValue.value.toString('hex'));
+	   const proof1 = web3ify(storageValue.proof);
+	   console.log("proof1", proof1);
+
 
  	} catch (error) {
       console.error("catch", error);
     }
-
+  /*
 	console.log("Verifying proof on Goerli...");
 	const proof = await generateProof(response.data.result, rpcBlock.data.result); //, blockGoerli.hash.toString());
 
@@ -314,10 +339,14 @@ async function awsproof(permalink)
 	const signer = wallet.connect(provider);
 	const bridge = new ethers.Contract(BRIDGE_GOERLI, BridgeJSON, provider);
 	const score = new ethers.Contract(SCORE_ADDRESS, ScoreJSON, signer);
-
+    try {
     let check = await bridge.verify(proof.data, SCOREAWS_ADDRESS, key, proof.value, 24 * 60 );
      
     console.log("verify on Goerli response: ", check);
+     } catch (error) {
+      console.error("catch tx", error.toString().substr(0,500));
+      return;
+    }
     /* 
     console.log("Calling scoreSync on Goerli..."); 
     
@@ -332,11 +361,126 @@ async function awsproof(permalink)
 	const receipt = await tx.wait(1);
 	console.log('Transaction block:', receipt.blockNumber);
 	*/
-	await awsmumbai(permalink);
+	//await awsmumbai(permalink);
+
+};
+
+async function proofTest(permalink)
+{	
+
+    console.log('Checking blockhash on Goerli... ');	
+	const blockGoerli = await getBlock(RPC_GOERLI, BRIDGE_GOERLI); //(RPC_GOERLI, BRIDGE_GOERLI);
+	console.log("Goerli block: ");
+	let date = new Date(blockGoerli.timestamp*1000);
+	console.log(JSON.stringify({number: parseInt(blockGoerli.number).toString(), 
+								hash: blockGoerli.hash.toString(),
+								timestamp: date.toUTCString() },
+								(_, v) => typeof v === 'BigNumber' ? v.toString() : v,
+								1));
+	
+	
+	let permalinkHex = BigInt(permalink).toString(16).padStart(64, '0');
+
+	
+	// position of map versions is 0x00
+	const key = "0x" + toHex(keccak256(hexToBytes(permalinkHex +
+								 "0000000000000000000000000000000000000000000000000000000000000000"))).toString();
+	const block = "0x" + parseInt(blockGoerli.number.toString()).toString(16);
+
+/*
+	const blockData1 = {"jsonrpc":"2.0",
+				  		"method":"eth_getBlockByNumber",
+				  		"params":["latest", false],
+				  		"id":1 };
+	//const rpcBlock1 = await axios.post(RPC_AWS_ENDPOINT, blockData1);
+	//console.log("block data: ", rpcBlock1.data.result);
+	//const block = "0x" + parseInt((rpcBlock1.data.result.number - 4270).toString()).toString(16);;
+*/
+	const data = {"jsonrpc":"2.0",
+				  "method":"eth_getProof",
+				  "params":[
+						SCOREAWS_MUMBAI,
+						[key],
+						block], 
+				  "id":1 };
+		  
+	//console.log("ethproof: ", data);
+
+	const response = await axios.post(RPC_MUMBAI, data);
+	console.log("response: ", response.data.result.storageProof);
+	
+	
+	const blockData = {"jsonrpc":"2.0",
+				  		"method":"eth_getBlockByNumber",
+				  		"params":[block, false],
+				  		"id":1 };
+
+	//console.log("block data: ", blockData);
+	const rpcBlock = await axios.post(RPC_MUMBAI, blockData);
+	console.log("block data: ", rpcBlock.data.result);
+	
+	
+	let value = response.data.result.storageProof[0].value.toString();
+	console.log("Value from L3 chain: ", value, response.data.result.storageProof[0].value );
+	//console.log("proof: ", response.data.result); //.result.storageProof[0]
+	//console.log("storageProof: ", response.data.result.storageProof[0]);
+	
+ 	/*
+ 	const getAndVerify = new GetAndVerify(RPC_L3_AXIOS);
+ 	
+    let blockHash       = blockGoerli.hash;
+    let accountAddress  = SCOREAWS_ADDRESS;
+    let position        = key;
+    
+    try {	 		 
+
+	   console.log("Verifying proof...");
+	   let storageValue = await getAndVerify.storageAgainstBlockNumber(accountAddress, position, block, blockHash);
+	   console.log("Value after verifying proof off-chain:", "0x"+storageValue.toString('hex'));
+
+ 	} catch (error) {
+      console.error("catch", error);
+    }
+  */
+	console.log("Verifying proof on Goerli...");
+	const proof = await generateProof(response.data.result, rpcBlock.data.result); //, blockGoerli.hash.toString());
+
+	const provider = new ethers.providers.JsonRpcProvider(RPC_GOERLI);
+	const wallet = new ethers.Wallet(KEY_OWNER);
+
+	const signer = wallet.connect(provider);
+	const bridge = new ethers.Contract(BRIDGE_GOERLI, BridgeJSON, provider);
+	const score = new ethers.Contract(SCORE_ADDRESS, ScoreJSON, signer);
+
+	try {
+    let check = await bridge.verify(proof.data, SCOREAWS_MUMBAI, key, proof.value, 24 * 60 );
+        console.log("verify on Goerli response: ", check);
+     
+ 	} catch (error) {
+      console.error("catch tx", error.toString().substr(0,500));
+      return;
+    }
+
+    /* 
+    console.log("Calling scoreSync on Goerli..."); 
+    
+    const tx = await score.syncScore(
+			permalink,
+			proof.value,
+			proof.data,
+			SCOREAWS_ADDRESS,
+	 		24 * 60);
+	 		
+	console.log("TX sent: ", tx.hash);
+	const receipt = await tx.wait(1);
+	console.log('Transaction block:', receipt.blockNumber);
+	*/
+	//await awsmumbai(permalink);
 
 };
 
 
 module.exports = {
-	awsproof
+	awsproof,
+	proofTest
 }

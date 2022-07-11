@@ -53,7 +53,7 @@ library MPT {
         }
 
         if (data.expectedValue.length == 0) return true;
-        else return false;
+        else revert("Invalid proof1"); //return false;
     }
 
     function verifyTrieProofBranch(
@@ -81,7 +81,7 @@ library MPT {
         }
 
         if (data.expectedValue.length == 0) return true;
-        else return false;
+        else revert("Invalid proof2"); //return false;
     }
 
     function verifyTrieProofLeafOrExtension(
@@ -151,7 +151,7 @@ library MPT {
             revert("Invalid proof");
         }
         if (data.expectedValue.length == 0) return true;
-        else return false;
+        else revert("Invalid proof5"); //return false;
     }
 
     function b2b32(bytes memory data) pure internal returns(bytes32 part) {
