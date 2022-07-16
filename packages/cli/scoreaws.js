@@ -1,10 +1,11 @@
-const {RPC_L3_ENDPOINT, RPC_L3_PASSWORD, RPC_L3_USER, CHAINID_AWS, 
+const {RPC_L3_ENDPOINT, RPC_L3_ENDPOINTS, RPC_L3_PASSWORD, RPC_L3_USER, CHAINID_AWS, RELAY,
 		 CHAINID_L3, KEY_OWNER, SCOREAWS_ADDRESS, SCOREAWS_MUMBAI, RPC_MUMBAI } = require('@list/config');
 const RPC_L3 =  {url: RPC_L3_ENDPOINT,  user: RPC_L3_USER, password: RPC_L3_PASSWORD};
 //const RPC_AWS =  {url: RPC_AWS_ENDPOINT,  user: RPC_AWS_USER, password: RPC_AWS_PASSWORD};
 
 const RPC_L3_AXIOS = "https://" + RPC_L3_USER + ":" + RPC_L3_PASSWORD + "@" + RPC_L3_ENDPOINT.replace("https://", "");
 
+const crypto = require('crypto');
 
 
 const ScoreJSON = require("@list/contracts/abi/contracts/aws.sol/ScoreAWS.json");
@@ -14,8 +15,9 @@ const { hexToBytes, toHex } = require("ethereum-cryptography/utils");
 const axios = require('axios');
 const ethereumprovider = new ethers.providers.JsonRpcProvider(RPC_L3);
 
-const { proofTest } = require("./awsproof");
-const { bridge, getBlock } = require("./bridge");
+const { proofTest, proofTest3 } = require("./awsproof");
+const { bridge, bridge3, getBlock } = require("./bridge");
+const { load } = require("./load");
 
 async function scoreaws(permalink, count)
 {	
@@ -39,9 +41,114 @@ async function scoreaws3(permalink, Score)
 	//console.log('Transaction block:', receipt.blockNumber);
 }
 
-async function setscore(permalink, value)
+function formatWinstonTime( ms )
+{
+    if( ms === undefined ) return "";
+    if( ms < 1000) return ms + " ms";
+    if ( ms < 60 * 1000) return parseInt(ms/1000) + " sec";
+    if ( ms < 60 * 60 * 1000) return parseInt(ms/1000/60) + " min";
+    return parseInt(ms/1000/60/60) + " h";
+};
+
+
+async function load1(permalink, count)
+{
+	let value = 1;
+	let errorCount = 0;
+	const startTime = Date.now();
+
+    
+	const wallet = ethers.Wallet.createRandom(); //new ethers.Wallet(RELAY[relayId]);
+	const address = wallet.address;
+	const rpcId = crypto.randomInt(1, 4);
+	const rpc =  {url: RPC_L3_ENDPOINTS[rpcId],  user: RPC_L3_USER, password: RPC_L3_PASSWORD};
+	console.log("load1 rpc: ", RPC_L3_ENDPOINTS[rpcId]);
+	const provider = new ethers.providers.JsonRpcProvider(rpc);
+	const signer = wallet.connect(provider);
+	const Score = new ethers.Contract(SCOREAWS_ADDRESS, ScoreJSON, signer);
+	let i = 0;
+	let prevTime = Date.now();
+	
+	while( i < count ) 
+	{ 
+		//console.log(' ');
+		//console.log("Load1: calling setscore number ", i);
+		try {
+			 if( i%100 === 0) await load(1, i, errorCount, startTime, provider, address);
+			 await signer.sendTransaction({
+								  to: address,
+								  value: 0
+							  });
+			 //await Score.setScore(permalink, value);
+			 //const nowTime = Date.now(); 
+			 //console.log("TX sent: ", tx.hash, "in", formatWinstonTime(nowTime-prevTime));
+			 //prevTime = nowTime;
+			 //const receipt = await tx.wait(2);
+			 //console.log('Transaction gas used:', receipt.gasUsed.toString(), 
+			 //			"gas price:", (receipt.effectiveGasPrice/1000000000).toString());
+			 i++;
+			 //value++;
+			 
+			//if( value > 100 ) value = 1; 
+		} catch (error) {
+      		console.error("catch", error.toString().substr(0,500));
+      		errorCount++;
+      	
+        }
+
+	}
+}	
+
+
+
+async function setscore(permalink, count)
+{
+	let value = 1;
+    if( count == 1) { await setscore3full(permalink, 10); return };
+    
+	const wallet = new ethers.Wallet(RELAY[1]);
+	const provider = new ethers.providers.JsonRpcProvider(RPC_L3);
+	const signer = wallet.connect(ethereumprovider);
+	const Score = new ethers.Contract(SCOREAWS_ADDRESS, ScoreJSON, signer);
+	let i = 0;
+	while( i < count ) 
+	{ 
+		console.log(' ');
+		console.log("Calling setscore number ", i);
+		await setscore3(permalink, value, Score, provider ); 
+		await bridge3(); 
+		await proofTest3(permalink); 
+		i++;
+		value++;
+		if( value > 100 ) value = 1; 
+	}
+	
+	
+}	
+
+
+async function setscore3(permalink, value, Score, provider)
+{		
+	//const oldScore = await Score.score(permalink);
+	//console.log("Old score is", oldScore.toString());
+	//await ethproof(permalink);
+	let gas = await provider.getFeeData();
+
+	//console.log( "Gas params: maxFeePerGas",  (gas.maxFeePerGas/1000000000).toString(), "maxPriorityFeePerGas", (gas.maxPriorityFeePerGas/1000000000).toString());
+
+	const tx = await Score.setScore(permalink, value,
+			{	 
+			  maxFeePerGas: gas.maxFeePerGas * 10 , 
+			  maxPriorityFeePerGas: gas.maxPriorityFeePerGas * 10 });
+
+	return tx;
+	//console.log("TX sent: ", tx.hash);
+}
+
+
+async function setscore3full(permalink, value)
 {	
-	const wallet = new ethers.Wallet(KEY_OWNER);
+	const wallet = new ethers.Wallet(RELAY[0]);
 	const mumbaiprovider = new ethers.providers.JsonRpcProvider(RPC_MUMBAI);
 	console.log("Calling Score L3 contract...");
 	const balance = await mumbaiprovider.getBalance("0xA5833655C441D486FB1DabCeb835f44DA73bf5E7");
@@ -204,5 +311,6 @@ async function ethproof(permalink)
 
 module.exports = {
 	scoreaws, 
-	setscore
+	setscore,
+	load1
 }

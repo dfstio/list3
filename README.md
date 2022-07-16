@@ -228,5 +228,18 @@ Options:
 - Transaction on mumbai proving exclusion
 - extend scope to roothashes of identity
 
+load1
+TX sent:  0xa567043f3a7326cd4327f59fcf06da2d53a4c58383085934254b6cdc8245ce29
+Transaction gas used: 28111 gas price: 15.000000007
 
+load2
+TX sent:  0x5e34de291998adcb021df02f7a4c2bcf5dd532b899c9d3b4f4020a723d3ca041
+Transaction gas used: 268436 gas price: 1.500000007
+
+load3
+Transaction gas used: 53325 gas price: 6.000000007
+
+load4
+TX sent:  0x8f040fe4a81dc9d6175beebaa1a3d511f89781e91afd58bac5880901f0fc17d6
+Transaction gas used: 265756 gas price: 1.500000007
 	

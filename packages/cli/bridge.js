@@ -1,9 +1,11 @@
 const {RPC_GOERLI, RPC_MUMBAI,  RPC_L3_ENDPOINT, RPC_L3_PASSWORD, RPC_L3_USER, 
-		KEY_OWNER, BRIDGE_MUMBAI, BRIDGE_GOERLI, SAFE_GOERLI } = require('@list/config');
+		KEY_OWNER, BRIDGE_MUMBAI, BRIDGE_GOERLI, BRIDGE_L3, SAFE_GOERLI } = require('@list/config');
 const RPC_L3 =  {url: RPC_L3_ENDPOINT,  user: RPC_L3_USER, password: RPC_L3_PASSWORD};
 const BridgeJSON = require("@list/contracts/abi/contracts/bridge.sol/Bridge.json");
 const ethers = require("ethers");
 const axios = require('axios');
+
+const { loadBridge } = require("./load");
 
 //const { safeSeal } = require("./safe");
 
@@ -21,6 +23,73 @@ async function bridge()
 	console.log("Sealing on goerli...");
 	//await safeSeal( RPC_GOERLI, BRIDGE_GOERLI, block, SAFE_GOERLI);
 	await seal( RPC_GOERLI, BRIDGE_GOERLI, block);
+
+
+
+	console.log(" ");
+	console.log("Sealing on mumbai...");
+	await seal( RPC_MUMBAI, BRIDGE_MUMBAI, block);
+	
+}
+
+async function load3(count)
+{
+	let errorCount = 0;
+	const startTime = Date.now();
+	const provider = new ethers.providers.JsonRpcProvider(RPC_L3);
+	const wallet = new ethers.Wallet(KEY_OWNER);
+	const signer = wallet.connect(provider);
+	const bridge = new ethers.Contract(BRIDGE_L3, BridgeJSON, signer);
+	
+	let i = 0;
+	while( i < count ) 
+	{ 
+		//console.log(' ');
+		//console.log("Load1: calling setscore number ", i);
+		try {
+			 	
+			const lastBlock = await provider.getBlock("latest");
+			const block = await provider.getBlock(lastBlock.number-15); // -15
+			let gas = await provider.getFeeData();
+			const tx = await bridge.seal(block.number, block.timestamp, block.hash, 
+				{ 
+			  		maxFeePerGas: gas.maxFeePerGas * 4 , 
+			  		maxPriorityFeePerGas: gas.maxPriorityFeePerGas * 4 });
+			 //console.log("TX sent: ", tx.hash);
+			 //const receipt = await tx.wait(2);
+			 //console.log('Transaction gas used:', receipt.gasUsed.toString(), 
+			 //			"gas price:", (receipt.effectiveGasPrice/1000000000).toString());
+
+			 loadBridge(i, errorCount, startTime);
+			 await tx.wait(10);
+			 i++;
+		} catch (error) {
+      		console.error("catch bridge", error.toString().substr(0,500));
+      		errorCount++;    	
+      		await sleep(60000);
+        }
+
+	}
+}	
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+async function bridge3()
+{	
+	const awsprovider = new ethers.providers.JsonRpcProvider(RPC_L3);
+	//console.log("Getting latest L3 block information...");
+	const block = await getBlock();
+	//console.log("Block:");
+	//console.log(JSON.stringify(block, null, 1));
+	
+	
+	//console.log(" ");
+	console.log("Sealing block data on L3...");
+	//await safeSeal( RPC_GOERLI, BRIDGE_GOERLI, block, SAFE_GOERLI);
+	await seal( RPC_L3, BRIDGE_L3, block);
 
 
 
@@ -76,7 +145,7 @@ async function getBlock()
 {	
 	const provider = new ethers.providers.JsonRpcProvider(RPC_L3);
 	const lastBlock = await provider.getBlock("latest");
-	const block = await provider.getBlock(lastBlock.number); // -15
+	const block = await provider.getBlock(lastBlock.number-15); // -15
 	let date = new Date(block.timestamp*1000);
 	console.log("Block:", block.number, date.toUTCString());
 	return block;
@@ -84,5 +153,7 @@ async function getBlock()
 
 module.exports = {
 	bridge,
-	getBlock
+	bridge3,
+	getBlock,
+	load3
 }

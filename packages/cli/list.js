@@ -1,6 +1,12 @@
 const {RPC_MUMBAI, RPC_GOERLI, RELAY, LIST_CONTRACT_ADDRESS, 
-		VERIFIER_ADDRESS, PROOF_DIR } = require('@list/config');
+		RPC_L3_ENDPOINT, RPC_L3_ENDPOINTS, RPC_L3_PASSWORD, RPC_L3_USER, LOAD_L3,
+		VERIFIER_ADDRESS, VERIFIER_ADDRESS_L3, PROOF_DIR } = require('@list/config');
+const RPC_L3 =  {url: RPC_L3_ENDPOINT,  user: RPC_L3_USER, password: RPC_L3_PASSWORD};
+const RPC_L3_AXIOS = "https://" + RPC_L3_USER + ":" + RPC_L3_PASSWORD + "@" + RPC_L3_ENDPOINT.replace("https://", "");
+const crypto = require('crypto');
+
 const ListJSON = require("@list/contracts/abi/contracts/list.sol/List.json");
+const LoadJSON = require("@list/contracts/abi/contracts/load.sol/Load.json");
 const VerifierJSON = require("@list/contracts/abi/contracts/verifier.sol/Verifier.json");
 const vKey = require("@list/circuit/keys/verification_key.json");
 const vKeyAdd = require("@list/circuit/keys/verification_keyadd.json");
@@ -15,6 +21,7 @@ const fs = require('fs').promises;
 const snarkjs = require("snarkjs");
 const { snark } = require("./snark");
 const { getPermalink } = require("./claim");
+const { load } = require("./load");
 
 
 
@@ -27,7 +34,7 @@ async function gettree(relayId)
 	 
      const events = await list.queryFilter('Version');
 	 const count = events.length;
-	 console.log("Records: %d", count);
+	 //console.log("Records: %d", count);
 	 
 	 let tree;
 	 tree = await newMemEmptyTrie();
@@ -322,6 +329,101 @@ async function verify(permalink, relayId)
 	 }
 };
 
+
+
+async function load2(permalink, count)
+{
+	/*
+	 const relayId = 1; 	
+	 let {tree, list} = await gettree(relayId); 	
+	 const input = await generateVerifierInput(tree, permalink);
+	 
+	 const result = await snark(input, 
+								"./packages/circuit/smt_js/smt.wasm", 
+								"./packages/circuit/zkeys/smt_0001.zkey",
+								vKey);
+	 const proof = result.proof;		
+	 if( result.isVerificationOK && (tree.F.toObject(tree.root).toString() !== result.publicSignals[0])) 
+	 {
+	 	console.error("wrong verification")
+	 	return; 
+	 };		
+	 */		
+				
+	 const proof = require("../../proof/proof.json");			
+	 const publicSignals = require("../../proof/public.json");								
+	 let i = 0;
+	 let errorCount = 0;
+	 const startTime = Date.now();
+	 const wallet = ethers.Wallet.createRandom(); //new ethers.Wallet(RELAY[relayId]);
+	 const address = wallet.address;
+	 const rpcId = crypto.randomInt(1, 4);
+	 const rpc =  {url: RPC_L3_ENDPOINTS[rpcId],  user: RPC_L3_USER, password: RPC_L3_PASSWORD};
+	 console.log("load2 rpc: ", RPC_L3_ENDPOINTS[rpcId]);
+	 const provider1 = new ethers.providers.JsonRpcProvider(rpc);
+	 const signer = wallet.connect(provider1);
+	 const loadContract = new ethers.Contract(LOAD_L3, LoadJSON, signer);
+	 
+	 while( i < count ) 
+	 { 
+		try {
+			 await load(2, i, errorCount, startTime, provider1, address);
+
+			 const tx = await loadContract.verify(permalink,
+			   [proof.pi_a[0], proof.pi_a[1]],
+			   [[proof.pi_b[0][1],proof.pi_b[0][0]],[proof.pi_b[1][1],proof.pi_b[1][0]]],
+			   [proof.pi_c[0],proof.pi_c[1]],
+			   publicSignals); //result.publicSignals
+			  console.log("TX sent: ", tx.hash);
+			  const receipt = await tx.wait(2);
+			  console.log('Transaction gas used:', receipt.gasUsed.toString(), 
+			 			"gas price:", (receipt.effectiveGasPrice/1000000000).toString());
+
+		   //console.log("TX sent: ", tx.hash );
+		   //const receipt = await tx.wait(1);
+		   console.log('Transaction block:', receipt.blockNumber);
+			  i++; 
+			   
+		} catch (error) {
+			console.error("catch load2", error.toString().substr(0,500));
+			errorCount++;
+	
+		}
+	 }
+};
+
+
+
+
+async function verify3(permalink, relayId)
+{
+	 
+	 let {tree, list} = await gettree(relayId); 	
+	 const input = await generateVerifierInput(tree, permalink);
+	 
+	 const result = await snark(input, 
+								"./packages/circuit/smt_js/smt.wasm", 
+								"./packages/circuit/zkeys/smt_0001.zkey",
+								vKey);
+	 													
+	 if( result.isVerificationOK && (tree.F.toObject(tree.root).toString() == result.publicSignals[0]))
+	 {
+	 	console.log("Verifying on L3...");
+	 	const ethereumprovider = new ethers.providers.JsonRpcProvider(RPC_L3);
+	 	const verifier = new ethers.Contract(VERIFIER_ADDRESS_L3, VerifierJSON, ethereumprovider);
+	 	const proof = result.proof;
+	 	const verified = await verifier.verifyProof(
+	 		[proof.pi_a[0], proof.pi_a[1]],
+	 		[[proof.pi_b[0][1],proof.pi_b[0][0]],[proof.pi_b[1][1],proof.pi_b[1][0]]],
+	 		[proof.pi_c[0],proof.pi_c[1]],
+	 		result.publicSignals);
+	 	
+	 
+		console.log("Verified: ", verified);
+	 }
+};
+
+
 async function verifierProof(permalink, relayId)
 {
 	 
@@ -498,8 +600,8 @@ async function generateVerifierInput(tree, _key)
 			value: res.found? tree.F.toObject(res.foundValue) : 0
 		};
 		
-    console.log("Input: ");
-    console.log( JSON.stringify(input, (_, v) => typeof v === 'bigint' ? v.toString() : v, 1));
+    //console.log("Input: ");
+    //console.log( JSON.stringify(input, (_, v) => typeof v === 'bigint' ? v.toString() : v, 1));
 	return input;
 }
 
@@ -520,5 +622,7 @@ module.exports = {
     update,
     revoke,
     verify,
+    verify3,
+    load2,
     verifierProof
 }

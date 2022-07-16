@@ -11,13 +11,13 @@ async function snark(input, wasm, zkey, vkey)
     const end1 = Date.now();
     console.log("Time generating proof", (end1-start1)/1000, "sec");
 
-    console.log("Proof: ");
-    console.log(JSON.stringify(proof, null, 1));
+    //console.log("Proof: ");
+    //console.log(JSON.stringify(proof, null, 1));
     await save(PROOF_DIR, proof, "proof");
     await save(PROOF_DIR, input, "input");
     
-    console.log("publicSignals: ");
-    console.log(JSON.stringify(publicSignals, null, 1));
+    //console.log("publicSignals: ");
+    //console.log(JSON.stringify(publicSignals, null, 1));
     await save(PROOF_DIR, publicSignals, "public");
     await save(PROOF_DIR, vkey, "verification_key");
     

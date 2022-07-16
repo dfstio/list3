@@ -2,18 +2,21 @@
 const { PROOF_DIR } = require('@list/config');
 const { Command } = require('commander');
 const program = new Command();
-const { add, madd, update, revoke, verify } = require("./list");
+const { add, madd, update, revoke, verify, verify3, load2} = require("./list");
 const { claim } = require("./claim");
 const { score, seal } = require("./score");
-const { scoreaws, setscore } = require("./scoreaws");
-const { awsproof } = require("./awsproof");
-const { bridge, getBlock } = require("./bridge");
+const { scoreaws, setscore, load1 } = require("./scoreaws");
+const { awsproof, load4 } = require("./awsproof");
+const { bridge, bridge3, getBlock, load3 } = require("./bridge");
 const { checkEthereum, ethproof } = require("./ethereum");
 const { sample } = require("./smt");
 const { L3 } = require("./l3");
 
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
+
+const LOAD_COUNT = 1000000;
+const LOAD_PERMALINK = 77;
 
 program
   .name('list')
@@ -89,6 +92,25 @@ program.command('verify')
     console.log('Verifying claim', permalink, 'on Goerli, SMT relay', relayId);
     await verify(permalink, relayId);
   });    
+
+program.command('verify3')
+  .description('Verify ZK proof of inclusion or exclusion on L3')
+  .argument('<permalink>', 'claim permalink')
+  .option('-relay <number>', 'relayId to use')
+  .action(async (permalink, options) => {
+  	const relayId = options.Relay? options.Relay : 1 ;
+    console.log('Verifying claim', permalink, 'on Goerli, SMT relay', relayId);
+    await verify3(permalink, relayId);
+  });   
+
+ 
+program.command('load2')
+  .description('Load2: Verify ZK proof of inclusion or exclusion on L3')
+  .action(async () => {
+    console.log('Load2 started');
+    await load2(LOAD_PERMALINK, LOAD_COUNT);
+  }); 
+
   
 program.command('score')
   .description('Example: Add score with transaction on Goerli with ZK proof of inclusion or exclusion')
@@ -115,10 +137,31 @@ program.command('scoreaws')
  program.command('setscore')
   .description('Example: Set score to value with transaction on AWS')
   .argument('<permalink>', 'claim permalink')
-  .argument('<value', 'value')
-  .action(async (permalink, value) => {
-    console.log('Setting AWS score', permalink, ' to ', value);
-    await setscore(permalink, value);
+  .argument('<count>', 'how many calls made')
+  .action(async (permalink, count) => {
+    console.log('Setting L3 score', permalink, count, ' times ');
+    await setscore(permalink, count);
+  });  
+
+ program.command('load1')
+  .description('Example: Set score load generation')
+  .action(async () => {
+    console.log('Generating load 1...');
+    await load1(LOAD_PERMALINK, LOAD_COUNT);
+  });  
+
+ program.command('load4')
+  .description('Example: Set score load generation')
+  .action(async () => {
+    console.log('Generating load 4...');
+    await load4(LOAD_PERMALINK, LOAD_COUNT);
+  }); 
+
+ program.command('load3')
+  .description('Example: bridge load generation')
+  .action(async () => {
+    console.log('Generating load 3...');
+    await load3(LOAD_COUNT);
   });  
 
   
@@ -136,6 +179,13 @@ program.command('bridge')
     await bridge();
   });    
   
+program.command('bridge3')
+  .description('Sealing blocknumber and blockhash on L3')
+  .action(async () => {
+    console.log('Sealing blocknumber and blockhash on L3... ');
+    await bridge3();
+  });    
+    
 program.command('block')
   .description('Get block number on Goerli')
   .action(async () => {
